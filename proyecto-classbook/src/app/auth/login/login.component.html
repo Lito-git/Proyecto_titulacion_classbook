@@ -1,0 +1,42 @@
+<!-- Pantalla de login de ClassBook -->
+<div class="login-container">
+
+    <div class="login-card">
+
+        <!-- Logo y título -->
+        <div class="login-header">
+            <img src="classbook_logo.png" alt="Logo ClassBook" class="login-logo" />
+            <h1 class="login-titulo">ClassBook</h1>
+            <p class="login-subtitulo">Sistema de Gestión Académica</p>
+        </div>
+
+        <!-- Formulario de login -->
+        <form (ngSubmit)="iniciarSesion()">
+
+            <!-- Campo email -->
+            <div class="campo">
+                <label for="email">Correo electrónico</label>
+                <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="correo@classbook.cl"
+                    required />
+            </div>
+
+            <!-- Campo contraseña -->
+            <div class="campo">
+                <label for="contrasena">Contraseña</label>
+                <input id="contrasena" type="password" [(ngModel)]="contrasena" name="contrasena" placeholder="••••••••"
+                    required />
+            </div>
+
+            <!-- Mensaje de error -->
+            <p class="error" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+            <!-- Botón de login -->
+            <button type="submit" [disabled]="cargando">
+                {{ cargando ? 'Ingresando...' : 'Ingresar' }}
+            </button>
+
+        </form>
+
+    </div>
+
+</div>

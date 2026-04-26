@@ -1,0 +1,40 @@
+<!-- Formulario de cambio de contraseña -->
+<div class="cambiar-contrasena-container">
+
+    <h2 class="titulo">Cambiar Contraseña</h2>
+
+    <form (ngSubmit)="cambiarContrasena()">
+
+        <!-- Contraseña actual -->
+        <div class="campo">
+            <label for="contrasenaActual">Contraseña actual</label>
+            <input id="contrasenaActual" type="password" [(ngModel)]="contrasenaActual" name="contrasenaActual"
+                placeholder="••••••••" required />
+        </div>
+
+        <!-- Contraseña nueva -->
+        <div class="campo">
+            <label for="contrasenaNueva">Contraseña nueva</label>
+            <input id="contrasenaNueva" type="password" [(ngModel)]="contrasenaNueva" name="contrasenaNueva"
+                placeholder="••••••••" required />
+        </div>
+
+        <!-- Confirmar contraseña nueva -->
+        <div class="campo">
+            <label for="confirmarContrasena">Confirmar contraseña nueva</label>
+            <input id="confirmarContrasena" type="password" [(ngModel)]="confirmarContrasena" name="confirmarContrasena"
+                placeholder="••••••••" required />
+        </div>
+
+        <!-- Mensajes de feedback -->
+        <p class="error" *ngIf="mensajeError">{{ mensajeError }}</p>
+        <p class="exito" *ngIf="mensajeExito">{{ mensajeExito }}</p>
+
+        <!-- Botón -->
+        <button type="submit" [disabled]="cargando">
+            {{ cargando ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+
+    </form>
+
+</div>

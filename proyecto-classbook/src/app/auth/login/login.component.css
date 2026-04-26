@@ -1,0 +1,116 @@
+/* Importamos la fuente Nunito Sans desde Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap');
+
+
+/* Contenedor principal que centra la card en la pantalla */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f2f5;
+}
+
+/* Card del formulario de login */
+.login-card {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Título principal */
+/* Título ClassBook */
+.login-titulo {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #0d2d5e;
+    text-align: center;
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+}
+
+/* Subtítulo */
+.login-subtitulo {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+/* Cada campo del formulario */
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+/* Etiquetas de los campos */
+.campo label {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+/* Inputs del formulario */
+.campo input {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+/* Resalta el input cuando está enfocado */
+.campo input:focus {
+    border-color: #1a73e8;
+}
+
+/* Mensaje de error */
+.error {
+    color: #d93025;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+/* Botón de login */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+/* Efecto hover del botón */
+button:hover {
+    background-color: #1558b0;
+}
+
+/* Estilo cuando el botón está deshabilitado */
+button:disabled {
+    background-color: #a0bce8;
+    cursor: not-allowed;
+}
+
+/* Contenedor del logo y subtítulo */
+.login-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+/* Logo de ClassBook */
+.login-logo {
+    width: 100px;
+    margin-bottom: 8px;
+}
