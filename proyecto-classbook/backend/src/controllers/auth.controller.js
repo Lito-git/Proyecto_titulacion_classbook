@@ -2,6 +2,7 @@
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { enviarContrasenaTemp } = require('../config/mailer');
 
 // Controlador de login
 // Valida las credenciales del usuario y retorna un token JWT si son correctas
@@ -97,4 +98,44 @@ const cambiarContrasena = async (req, res) => {
     }
 };
 
-module.exports = { login, cambiarContrasena };
+// Controlador de recuperación de contraseña
+// Genera una nueva contraseña temporal y la envía al correo del usuario
+const recuperarContrasena = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        // Verificamos que el email esté registrado en la BD
+        const [usuarios] = await db.query(
+            'SELECT * FROM usuarios WHERE usuario_email = ?',
+            [email]
+        );
+
+        if (usuarios.length === 0) {
+            return res.status(404).json({ mensaje: 'No existe una cuenta asociada a ese correo.' });
+        }
+
+        const usuario = usuarios[0];
+
+        // Generamos una contraseña temporal aleatoria
+        const contrasenaTemp = Math.random().toString(36).slice(-10).toUpperCase();
+
+        // Encriptamos la contraseña temporal
+        const hash = await bcrypt.hash(contrasenaTemp, 10);
+
+        // Actualizamos la contraseña en la BD
+        await db.query(
+            'UPDATE usuarios SET usuario_contrasena = ? WHERE usuario_id = ?',
+            [hash, usuario.usuario_id]
+        );
+
+        // Enviamos la nueva contraseña temporal por correo
+        await enviarContrasenaTemp(email, usuario.usuario_nombre, contrasenaTemp, true);
+
+        res.json({ mensaje: 'Se envió una nueva contraseña temporal a tu correo.' });
+
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error en el servidor.', error: error.message });
+    }
+};
+
+module.exports = { login, cambiarContrasena, recuperarContrasena };

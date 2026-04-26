@@ -1,8 +1,4 @@
-/* Importamos la fuente Nunito Sans desde Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap');
-
-
-/* Contenedor principal que centra la card en la pantalla */
+/* Reutilizamos el mismo estilo visual del login para consistencia */
 .login-container {
     display: flex;
     justify-content: center;
@@ -11,7 +7,6 @@
     background-color: #f0f2f5;
 }
 
-/* Card del formulario de login */
 .login-card {
     background-color: #ffffff;
     padding: 40px;
@@ -21,8 +16,18 @@
     max-width: 400px;
 }
 
-/* Título principal */
-/* Título ClassBook */
+.login-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.login-logo {
+    width: 80px;
+    margin-bottom: 8px;
+}
+
 .login-titulo {
     font-family: 'Nunito Sans', sans-serif;
     font-size: 28px;
@@ -33,29 +38,25 @@
     letter-spacing: -0.5px;
 }
 
-/* Subtítulo */
 .login-subtitulo {
     font-size: 14px;
     color: #666;
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 8px;
 }
 
-/* Cada campo del formulario */
 .campo {
     display: flex;
     flex-direction: column;
     margin-bottom: 16px;
 }
 
-/* Etiquetas de los campos */
 .campo label {
     font-size: 14px;
     color: #333;
     margin-bottom: 6px;
 }
 
-/* Inputs del formulario */
 .campo input {
     padding: 10px 12px;
     border: 1px solid #ccc;
@@ -65,19 +66,22 @@
     transition: border-color 0.2s;
 }
 
-/* Resalta el input cuando está enfocado */
 .campo input:focus {
     border-color: #1a73e8;
 }
 
-/* Mensaje de error */
 .error {
     color: #d93025;
     font-size: 13px;
     margin-bottom: 12px;
 }
 
-/* Botón de login */
+.exito {
+    color: #1e8e3e;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
 button {
     width: 100%;
     padding: 12px;
@@ -90,19 +94,17 @@ button {
     transition: background-color 0.2s;
 }
 
-/* Efecto hover del botón */
 button:hover {
     background-color: #1558b0;
 }
 
-/* Estilo cuando el botón está deshabilitado */
 button:disabled {
     background-color: #a0bce8;
     cursor: not-allowed;
 }
 
-/* Enlace de recuperación de contraseña */
-.recuperar {
+/* Enlace para volver al login */
+.volver {
     text-align: center;
     margin-top: 16px;
     color: #1a73e8;
@@ -110,20 +112,6 @@ button:disabled {
     cursor: pointer;
 }
 
-.recuperar:hover {
+.volver:hover {
     text-decoration: underline;
-}
-
-/* Contenedor del logo y subtítulo */
-.login-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 24px;
-}
-
-/* Logo de ClassBook */
-.login-logo {
-    width: 100px;
-    margin-bottom: 8px;
 }

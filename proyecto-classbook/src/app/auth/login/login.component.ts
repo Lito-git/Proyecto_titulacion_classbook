@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, CommonModule], // Standalone importa sus dependencias directamente
+  imports: [FormsModule, CommonModule, RouterModule], // Standalone importa sus dependencias directamente
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })

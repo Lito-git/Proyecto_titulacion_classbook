@@ -1,0 +1,38 @@
+<!-- Pantalla de recuperación de contraseña -->
+<div class="login-container">
+
+    <div class="login-card">
+
+        <!-- Logo y título -->
+        <div class="login-header">
+            <img src="classbook_logo.png" alt="Logo ClassBook" class="login-logo" />
+            <h1 class="login-titulo">ClassBook</h1>
+            <p class="login-subtitulo">Recuperar contraseña</p>
+        </div>
+
+        <!-- Formulario de recuperación -->
+        <form (ngSubmit)="recuperarContrasena()">
+
+            <div class="campo">
+                <label for="email">Correo electrónico</label>
+                <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="correo@classbook.cl"
+                    required />
+            </div>
+
+            <!-- Mensajes de feedback -->
+            <p class="error" *ngIf="mensajeError">{{ mensajeError }}</p>
+            <p class="exito" *ngIf="mensajeExito">{{ mensajeExito }}</p>
+
+            <!-- Botón -->
+            <button type="submit" [disabled]="cargando">
+                {{ cargando ? 'Enviando...' : 'Enviar nueva contraseña' }}
+            </button>
+
+        </form>
+
+        <!-- Enlace para volver al login -->
+        <p class="volver" (click)="volverAlLogin()">← Volver al inicio de sesión</p>
+
+    </div>
+
+</div>
