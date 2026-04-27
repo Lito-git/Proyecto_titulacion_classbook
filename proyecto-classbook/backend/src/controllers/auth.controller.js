@@ -13,9 +13,9 @@ const login = async (req, res) => {
         // Buscamos el usuario por email junto con el nombre de su rol
         const [usuarios] = await db.query(
             `SELECT u.*, r.rol_nombre
-            FROM usuarios u
-            JOIN roles r ON u.usuario_rol_id = r.rol_id
-            WHERE u.usuario_email = ?`,
+             FROM usuarios u
+             JOIN roles r ON u.usuario_rol_id = r.rol_id
+             WHERE u.usuario_email = ?`,
             [email]
         );
 
@@ -25,6 +25,11 @@ const login = async (req, res) => {
         }
 
         const usuario = usuarios[0];
+
+        // Verificamos que el usuario esté activo
+        if (usuario.usuario_activo === 0) {
+            return res.status(401).json({ mensaje: 'Tu cuenta ha sido desactivada. Contacta al administrador.' });
+        }
 
         // Comparamos la contraseña ingresada con el hash guardado en la BD
         const contrasenaValida = await bcrypt.compare(contrasena, usuario.usuario_contrasena);
@@ -114,6 +119,11 @@ const recuperarContrasena = async (req, res) => {
         }
 
         const usuario = usuarios[0];
+
+        // Verificamos que el usuario esté activo
+        if (usuario.usuario_activo === 0) {
+            return res.status(401).json({ mensaje: 'Tu cuenta ha sido desactivada. Contacta al administrador.' });
+        }
 
         // Generamos una contraseña temporal aleatoria
         const contrasenaTemp = Math.random().toString(36).slice(-10).toUpperCase();
