@@ -11,7 +11,7 @@ export class AuthService {
   // URL base del backend
   private apiUrl = 'http://localhost:3000';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) { }
 
   // Método para iniciar sesión
   // Envía las credenciales al backend y recibe el token JWT
@@ -19,11 +19,13 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/auth/login`, { email, contrasena });
   }
 
-  // Guarda el token y el rol en sessionStorage al iniciar sesión
   // sessionStorage se limpia automáticamente al cerrar el navegador
-  guardarSesion(token: string, rol: string) {
+  // Guarda el token, rol, nombre y apellido en sessionStorage al iniciar sesión
+  guardarSesion(token: string, rol: string, nombre: string, apellido: string) {
     sessionStorage.setItem('token', token);
     sessionStorage.setItem('rol', rol);
+    sessionStorage.setItem('nombre', nombre);
+    sessionStorage.setItem('apellido', apellido);
   }
 
   // Cierra la sesión eliminando los datos del sessionStorage

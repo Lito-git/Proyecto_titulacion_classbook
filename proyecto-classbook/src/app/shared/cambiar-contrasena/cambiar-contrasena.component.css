@@ -1,81 +1,155 @@
-/* Contenedor principal */
-.cambiar-contrasena-container {
-    max-width: 480px;
-    background-color: #ffffff;
-    padding: 32px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+/* Layout principal */
+.layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+/* Contenido principal */
+.contenido {
+    margin-left: 230px;
+    padding: 40px;
+    flex: 1;
 }
 
 /* Título */
 .titulo {
     font-family: 'Nunito Sans', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 24px;
+    font-weight: 800;
     color: #0d2d5e;
-    margin-bottom: 24px;
+    margin-bottom: 4px;
 }
 
-/* Cada campo del formulario */
+.subtitulo {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 32px;
+}
+
+/* Contenedor del formulario */
+.formulario-container {
+    max-width: 480px;
+}
+
+/* Formulario */
 .campo {
     display: flex;
     flex-direction: column;
     margin-bottom: 16px;
 }
 
-/* Etiquetas */
 .campo label {
-    font-size: 14px;
-    color: #333;
+    font-size: 13px;
+    color: #555;
     margin-bottom: 6px;
 }
 
-/* Inputs */
 .campo input {
     padding: 10px 12px;
-    border: 1px solid #ccc;
+    border: 1px solid #e0e0e0;
     border-radius: 6px;
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s;
+    background-color: #ffffff;
 }
 
 .campo input:focus {
-    border-color: #1a73e8;
+    border-color: #7c3aed;
 }
 
-/* Mensaje de error */
+/* Mensajes */
 .error {
     color: #d93025;
     font-size: 13px;
     margin-bottom: 12px;
 }
 
-/* Mensaje de éxito */
 .exito {
     color: #1e8e3e;
     font-size: 13px;
     margin-bottom: 12px;
 }
 
-/* Botón */
+/* Botón guardar */
 button {
     width: 100%;
     padding: 12px;
-    background-color: #1a73e8;
+    background-color: #7c3aed;
     color: white;
     border: none;
     border-radius: 6px;
     font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
+    margin-bottom: 24px;
 }
 
 button:hover {
-    background-color: #1558b0;
+    background-color: #6d28d9;
 }
 
 button:disabled {
-    background-color: #a0bce8;
+    background-color: #c4b5fd;
     cursor: not-allowed;
+}
+
+/* Recomendaciones de seguridad */
+.recomendaciones {
+    background-color: #e8f0fe;
+    border-radius: 8px;
+    padding: 16px 20px;
+}
+
+.recomendaciones-titulo {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a73e8;
+    margin-bottom: 8px;
+}
+
+.recomendaciones ul {
+    list-style: disc;
+    padding-left: 20px;
+    margin: 0;
+}
+
+.recomendaciones ul li {
+    font-size: 13px;
+    color: #1a73e8;
+    margin-bottom: 4px;
+}
+
+/* Wrapper input con botón ojo */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding-right: 40px;
+}
+
+/* Botón mostrar/ocultar contraseña */
+.btn-ojo {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+    width: auto;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.btn-ojo:hover {
+    color: #555;
+    background: none;
 }

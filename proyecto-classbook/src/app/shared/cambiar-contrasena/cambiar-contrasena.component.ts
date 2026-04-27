@@ -2,12 +2,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { NavbarComponent } from '../../administrador/navbar/navbar.component';
 
 @Component({
   selector: 'app-cambiar-contrasena',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule], // Standalone importa sus dependencias directamente
+  imports: [CommonModule, FormsModule, NavbarComponent],
   templateUrl: './cambiar-contrasena.component.html',
   styleUrls: ['./cambiar-contrasena.component.css']
 })
@@ -19,6 +20,11 @@ export class CambiarContrasenaComponent {
   mensajeExito: string = '';
   mensajeError: string = '';
   cargando: boolean = false;
+
+  // Variables para mostrar/ocultar contraseñas
+  mostrarActual: boolean = false;
+  mostrarNueva: boolean = false;
+  mostrarConfirmar: boolean = false;
 
   private apiUrl = 'http://localhost:3000';
 

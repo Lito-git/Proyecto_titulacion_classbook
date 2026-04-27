@@ -1,0 +1,102 @@
+<!-- Layout principal -->
+<div class="layout">
+
+    <!-- Navbar lateral -->
+    <app-navbar></app-navbar>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+
+        <!-- Encabezado -->
+        <div class="encabezado">
+            <div>
+                <h1 class="titulo">Gestión de Asignaturas</h1>
+                <p class="subtitulo">Administra las asignaturas del plan de estudios</p>
+            </div>
+            <button class="btn-crear" (click)="abrirModalCrear()">+ Crear Asignatura</button>
+        </div>
+
+        <!-- Nota informativa -->
+        <div class="nota-info">
+            <p>Para la marcha blanca del sistema, solo se consideran las asignaturas de Lenguaje y Comunicación,
+                Matemática, Ciencias Naturales e Historia, Geografía y Ciencias Sociales.</p>
+        </div>
+
+        <!-- Mensajes -->
+        <p class="exito" *ngIf="mensajeExito">{{ mensajeExito }}</p>
+        <p class="error" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+        <!-- Lista de asignaturas -->
+        <div class="lista-asignaturas">
+            <div class="item-asignatura" *ngFor="let asignatura of asignaturas">
+
+                <div class="asignatura-info">
+                    <!-- Icono -->
+                    <div class="asignatura-icono">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="asignatura-nombre">{{ asignatura.asignatura_nombre }}</h3>
+                        <p class="asignatura-descripcion">{{ asignatura.asignatura_descripcion || 'Sin descripción' }}
+                        </p>
+                        <!-- Acciones -->
+                        <div class="asignatura-acciones">
+                            <button class="btn-editar" (click)="abrirModalEditar(asignatura)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                </svg>
+                                Editar
+                            </button>
+                            <button class="btn-eliminar" (click)="eliminarAsignatura(asignatura.asignatura_id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6" />
+                                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                    <path d="M10 11v6M14 11v6" />
+                                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                </svg>
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal crear/editar asignatura -->
+        <div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+            <div class="modal" (click)="$event.stopPropagation()">
+                <h2 class="modal-titulo">{{ modoEdicion ? 'Editar Asignatura' : 'Crear Asignatura' }}</h2>
+
+                <div class="campo">
+                    <label>Nombre de la asignatura</label>
+                    <input type="text" [(ngModel)]="formulario.nombre" placeholder="Ej: Matemática" />
+                </div>
+                <div class="campo">
+                    <label>Descripción (opcional)</label>
+                    <input type="text" [(ngModel)]="formulario.descripcion"
+                        placeholder="Ej: Álgebra, geometría y estadística" />
+                </div>
+
+                <p class="exito" *ngIf="mensajeExito">{{ mensajeExito }}</p>
+                <p class="error" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+                <div class="modal-acciones">
+                    <button class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+                    <button class="btn-guardar" (click)="guardarAsignatura()" [disabled]="cargando">
+                        {{ cargando ? 'Guardando...' : 'Guardar' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>

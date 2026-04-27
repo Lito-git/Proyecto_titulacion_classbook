@@ -9,6 +9,9 @@ const db = require('./src/config/db');
 // Importamos las rutas
 const authRoutes = require('./src/routes/auth.routes');
 const usuariosRoutes = require('./src/routes/usuarios.routes');
+const cursosRoutes = require('./src/routes/cursos.routes');
+const asignaturasRoutes = require('./src/routes/asignaturas.routes');
+const historialRoutes = require('./src/routes/historial.routes');
 
 // Inicializamos la aplicación Express
 const app = express();
@@ -20,6 +23,9 @@ app.use(express.json());  // Permite leer el body de las peticiones en formato J
 // Registramos las rutas con sus prefijos
 app.use('/auth', authRoutes);
 app.use('/usuarios', usuariosRoutes);
+app.use('/cursos', cursosRoutes);
+app.use('/asignaturas', asignaturasRoutes);
+app.use('/historial', historialRoutes);
 
 // Ruta de prueba para verificar que el servidor está funcionando
 app.get('/', (req, res) => {
@@ -33,6 +39,25 @@ app.get('/test-db', async (req, res) => {
     res.json({ mensaje: 'Conexión a la base de datos exitosa', resultado: resultado[0].resultado });
   } catch (error) {
     res.status(500).json({ mensaje: 'Error al conectar con la base de datos', error: error.message });
+  }
+});
+
+// Ruta para verificar el estado de los servicios del sistema
+// Intenta hacer una consulta simple a la BD para verificar su estado
+app.get('/estado', async (req, res) => {
+  try {
+    await db.query('SELECT 1');
+    res.json({
+      baseDatos: 'Operativo',
+      backend: 'Operativo',
+      autenticacion: 'Operativo'
+    });
+  } catch (error) {
+    res.json({
+      baseDatos: 'Sin conexión',
+      backend: 'Operativo',
+      autenticacion: 'Operativo'
+    });
   }
 });
 

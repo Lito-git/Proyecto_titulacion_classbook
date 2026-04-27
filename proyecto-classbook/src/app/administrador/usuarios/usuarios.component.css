@@ -1,0 +1,319 @@
+/* Layout principal */
+.layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+/* Contenido principal */
+.contenido {
+    margin-left: 230px;
+    padding: 40px;
+    flex: 1;
+}
+
+/* Encabezado con título y botón crear */
+.encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.titulo {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #0d2d5e;
+    margin-bottom: 4px;
+}
+
+.subtitulo {
+    font-size: 14px;
+    color: #999;
+}
+
+/* Botón crear usuario */
+.btn-crear {
+    padding: 10px 20px;
+    background-color: #7c3aed;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-crear:hover {
+    background-color: #6d28d9;
+}
+
+/* Buscador */
+.buscador {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 24px;
+    outline: none;
+    background-color: #ffffff;
+    box-sizing: border-box;
+}
+
+.buscador:focus {
+    border-color: #7c3aed;
+}
+
+/* Tabla */
+.tabla-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla thead tr {
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.tabla th {
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #999;
+    text-align: left;
+}
+
+.tabla td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.tabla tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Fila de usuario inactivo */
+.tabla tbody tr.inactivo td {
+    color: #bbb;
+}
+
+/* Badges de rol */
+.badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge.estudiante {
+    background-color: #e8f0fe;
+    color: #1a73e8;
+}
+
+.badge.docente {
+    background-color: #e6f4ea;
+    color: #1e8e3e;
+}
+
+.badge.inspector {
+    background-color: #fff3e0;
+    color: #e37400;
+}
+
+.badge.administrador {
+    background-color: #f3e8ff;
+    color: #7c3aed;
+}
+
+/* Estado activo/inactivo */
+.estado {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.estado.activo {
+    background-color: #e6f4ea;
+    color: #1e8e3e;
+}
+
+.estado.inactivo {
+    background-color: #f5f5f5;
+    color: #999;
+}
+
+/* Botones de acción */
+.acciones {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-accion {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+}
+
+.btn-accion:hover {
+    opacity: 0.8;
+}
+
+.btn-accion.naranja {
+    background-color: #fff3e0;
+    color: #e37400;
+}
+
+.btn-accion.gris {
+    background-color: #f5f5f5;
+    color: #555;
+}
+
+.btn-accion.rojo {
+    background-color: #fce8e6;
+    color: #d93025;
+}
+
+.btn-accion.verde {
+    background-color: #e6f4ea;
+    color: #1e8e3e;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 32px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-titulo {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0d2d5e;
+    margin-bottom: 24px;
+}
+
+/* Campos del formulario */
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.campo label {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+.campo input,
+.campo select {
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.campo input:focus,
+.campo select:focus {
+    border-color: #7c3aed;
+}
+
+.campo input:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+}
+
+/* Acciones del modal */
+.modal-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-cancelar {
+    padding: 10px 20px;
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #555;
+}
+
+.btn-guardar {
+    padding: 10px 20px;
+    background-color: #7c3aed;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-guardar:hover {
+    background-color: #6d28d9;
+}
+
+.btn-guardar:disabled {
+    background-color: #c4b5fd;
+    cursor: not-allowed;
+}
+
+/* Mensajes */
+.exito {
+    color: #1e8e3e;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.error {
+    color: #d93025;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.btn-accion:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}

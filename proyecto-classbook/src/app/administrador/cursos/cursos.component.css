@@ -1,0 +1,281 @@
+/* Layout principal */
+.layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+/* Contenido principal */
+.contenido {
+    margin-left: 230px;
+    padding: 40px;
+    flex: 1;
+}
+
+/* Encabezado */
+.encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.titulo {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #0d2d5e;
+    margin-bottom: 4px;
+}
+
+.subtitulo {
+    font-size: 14px;
+    color: #999;
+}
+
+/* Botón crear */
+.btn-crear {
+    padding: 10px 20px;
+    background-color: #7c3aed;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-crear:hover {
+    background-color: #6d28d9;
+}
+
+/* Grid de tarjetas */
+.grid-cursos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+/* Tarjeta de curso */
+.tarjeta-curso {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    position: relative;
+}
+
+/* Badge activo */
+.badge-activo {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background-color: #e6f4ea;
+    color: #1e8e3e;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+/* Nombre del curso */
+.curso-nombre {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0d2d5e;
+    margin-bottom: 10px;
+    margin-top: 8px;
+}
+
+/* Nivel del curso */
+.curso-nivel {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 20px;
+}
+
+/* Acciones de la tarjeta */
+.curso-acciones {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-editar {
+    flex: 1;
+    padding: 8px;
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #333;
+    transition: background-color 0.2s;
+}
+
+.btn-editar:hover {
+    background-color: #e8e8e8;
+}
+
+.btn-eliminar {
+    flex: 1;
+    padding: 8px;
+    background-color: #fce8e6;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #d93025;
+    transition: background-color 0.2s;
+}
+
+.btn-eliminar:hover {
+    background-color: #f5c6c3;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 32px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-titulo {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0d2d5e;
+    margin-bottom: 24px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.campo label {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+.campo input {
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.campo input:focus {
+    border-color: #7c3aed;
+}
+
+.modal-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-cancelar {
+    padding: 10px 20px;
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #555;
+}
+
+.btn-guardar {
+    padding: 10px 20px;
+    background-color: #7c3aed;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-guardar:hover {
+    background-color: #6d28d9;
+}
+
+.btn-guardar:disabled {
+    background-color: #c4b5fd;
+    cursor: not-allowed;
+}
+
+.exito {
+    color: #1e8e3e;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.error {
+    color: #d93025;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+/* Alineación icono + texto en botones */
+.btn-editar,
+.btn-eliminar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* Estudiantes matriculados */
+.curso-estudiantes {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.curso-estudiantes-numero {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0d2d5e;
+}
+
+.curso-estudiantes-label {
+    font-size: 13px;
+    color: #999;
+}
+
+.campo select {
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: #ffffff;
+}
+
+.campo select:focus {
+    border-color: #7c3aed;
+}

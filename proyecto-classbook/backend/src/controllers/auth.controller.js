@@ -2,7 +2,7 @@
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { enviarContrasenaTemp } = require('../config/mailer');
+const { enviarContrasenaTemp, notificarCambioContrasena } = require('../config/mailer');
 
 // Controlador de login
 // Valida las credenciales del usuario y retorna un token JWT si son correctas
@@ -61,10 +61,9 @@ const login = async (req, res) => {
 // Permite al usuario cambiar su contraseña ingresando la actual y la nueva
 const cambiarContrasena = async (req, res) => {
     const { contrasenaActual, contrasenaNueva } = req.body;
-    const usuarioId = req.usuario.id; // Viene del token JWT verificado por el middleware
+    const usuarioId = req.usuario.id;
 
     try {
-        // Buscamos el usuario en la BD
         const [usuarios] = await db.query(
             'SELECT * FROM usuarios WHERE usuario_id = ?',
             [usuarioId]
@@ -76,20 +75,20 @@ const cambiarContrasena = async (req, res) => {
 
         const usuario = usuarios[0];
 
-        // Verificamos que la contraseña actual sea correcta
         const contrasenaValida = await bcrypt.compare(contrasenaActual, usuario.usuario_contrasena);
         if (!contrasenaValida) {
             return res.status(401).json({ mensaje: 'La contraseña actual es incorrecta.' });
         }
 
-        // Encriptamos la nueva contraseña
         const hashNueva = await bcrypt.hash(contrasenaNueva, 10);
 
-        // Actualizamos la contraseña en la BD
         await db.query(
             'UPDATE usuarios SET usuario_contrasena = ? WHERE usuario_id = ?',
             [hashNueva, usuarioId]
         );
+
+        // Enviamos notificación por correo al usuario
+        await notificarCambioContrasena(usuario.usuario_email, usuario.usuario_nombre);
 
         res.json({ mensaje: 'Contraseña actualizada correctamente.' });
 

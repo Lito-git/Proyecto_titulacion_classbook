@@ -1,0 +1,191 @@
+<!-- Layout principal -->
+<div class="layout">
+
+    <!-- Navbar lateral -->
+    <app-navbar></app-navbar>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+
+        <!-- Encabezado -->
+        <div class="encabezado">
+            <div>
+                <h1 class="titulo">Gestión de Usuarios</h1>
+                <p class="subtitulo">Administra usuarios del sistema ClassBook</p>
+            </div>
+            <button class="btn-crear" (click)="abrirModalCrear()">+ Crear Usuario</button>
+        </div>
+
+        <!-- Buscador -->
+        <input class="buscador" type="text" placeholder="Buscar por nombre, email o rol..." [(ngModel)]="busqueda"
+            (input)="filtrar()" />
+
+        <!-- Mensajes -->
+        <p class="exito" *ngIf="mensajeExito">{{ mensajeExito }}</p>
+        <p class="error" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+        <!-- Tabla de usuarios -->
+        <div class="tabla-container">
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th>NOMBRE</th>
+                        <th>EMAIL</th>
+                        <th>ROL</th>
+                        <th>CURSO / ASIGNATURA</th>
+                        <th>ESTADO</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let usuario of usuariosFiltrados"
+                        [ngClass]="{'inactivo': usuario.usuario_activo === 0}">
+                        <td>{{ usuario.usuario_nombre }} {{ usuario.usuario_apellido }}</td>
+                        <td>{{ usuario.usuario_email }}</td>
+                        <td>
+                            <span class="badge" [ngClass]="usuario.rol_nombre">
+                                {{ usuario.rol_nombre }}
+                            </span>
+                        </td>
+                        <td>
+                            <span *ngIf="usuario.rol_nombre === 'estudiante'">
+                                {{ usuario.estudiante_curso || '-' }}
+                            </span>
+                            <span *ngIf="usuario.rol_nombre === 'docente'">
+                                {{ usuario.docente_asignatura ? usuario.docente_asignatura + ' - ' +
+                                usuario.docente_curso : '-' }}
+                            </span>
+                            <span *ngIf="usuario.rol_nombre !== 'estudiante' && usuario.rol_nombre !== 'docente'">
+                                -
+                            </span>
+                        </td>
+                        <td>
+                            <span class="estado" [ngClass]="usuario.usuario_activo === 1 ? 'activo' : 'inactivo'">
+                                {{ usuario.usuario_activo === 1 ? 'Activo' : 'Inactivo' }}
+                            </span>
+                        </td>
+                        <td class="acciones">
+                            <!-- Resetear contraseña (deshabilitado si inactivo) -->
+                            <button class="btn-accion naranja" title="Resetear contraseña"
+                                [disabled]="usuario.usuario_activo === 0"
+                                (click)="resetearContrasena(usuario.usuario_id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                </svg>
+                            </button>
+                            <!-- Editar (deshabilitado si inactivo) -->
+                            <button class="btn-accion gris" title="Editar usuario"
+                                [disabled]="usuario.usuario_activo === 0" (click)="abrirModalEditar(usuario)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7" />
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                </svg>
+                            </button>
+                            <!-- Activar/Desactivar -->
+                            <button class="btn-accion" [ngClass]="usuario.usuario_activo === 1 ? 'rojo' : 'verde'"
+                                [title]="usuario.usuario_activo === 1 ? 'Desactivar usuario' : 'Activar usuario'"
+                                (click)="toggleActivo(usuario.usuario_id)">
+                                <svg *ngIf="usuario.usuario_activo === 1" xmlns="http://www.w3.org/2000/svg" width="15"
+                                    height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <line x1="23" y1="18" x2="17" y2="18" />
+                                </svg>
+                                <svg *ngIf="usuario.usuario_activo === 0" xmlns="http://www.w3.org/2000/svg" width="15"
+                                    height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <line x1="23" y1="18" x2="17" y2="18" />
+                                    <line x1="20" y1="15" x2="20" y2="21" />
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Modal crear/editar usuario -->
+        <div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+            <div class="modal" (click)="$event.stopPropagation()">
+                <h2 class="modal-titulo">{{ modoEdicion ? 'Editar Usuario' : 'Crear Usuario' }}</h2>
+
+                <div class="campo">
+                    <label>Nombre</label>
+                    <input type="text" [(ngModel)]="formulario.nombre" placeholder="Nombre" />
+                </div>
+                <div class="campo">
+                    <label>Apellido</label>
+                    <input type="text" [(ngModel)]="formulario.apellido" placeholder="Apellido" />
+                </div>
+                <div class="campo">
+                    <label>Correo electrónico</label>
+                    <input type="email" [(ngModel)]="formulario.email" placeholder="correo@classbook.cl"
+                        [disabled]="modoEdicion" />
+                </div>
+                <div class="campo">
+                    <label>Rol</label>
+                    <select [(ngModel)]="formulario.rol_id" [disabled]="modoEdicion">
+                        <option value="0" disabled>Selecciona un rol</option>
+                        <option *ngFor="let rol of roles" [value]="rol.rol_id">{{ rol.rol_nombre }}</option>
+                    </select>
+                </div>
+
+                <!-- Campos adicionales para estudiante (solo al crear) -->
+                <ng-container *ngIf="!modoEdicion && getRolNombre() === 'estudiante'">
+                    <div class="campo">
+                        <label>RUT</label>
+                        <input type="text" [(ngModel)]="formulario.rut" placeholder="12345678-9" />
+                    </div>
+                    <div class="campo">
+                        <label>Curso</label>
+                        <select [(ngModel)]="formulario.curso_id">
+                            <option value="0" disabled>Selecciona un curso</option>
+                            <option *ngFor="let curso of cursos" [value]="curso.curso_id">{{ curso.curso_nombre }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label>Fecha de nacimiento (opcional)</label>
+                        <input type="date" [(ngModel)]="formulario.fecha_nacimiento" />
+                    </div>
+                </ng-container>
+
+                <!-- Campos adicionales para docente (solo al crear) -->
+                <ng-container *ngIf="!modoEdicion && getRolNombre() === 'docente'">
+                    <div class="campo">
+                        <label>Curso</label>
+                        <select [(ngModel)]="formulario.curso_id">
+                            <option value="0" disabled>Selecciona un curso</option>
+                            <option *ngFor="let curso of cursos" [value]="curso.curso_id">{{ curso.curso_nombre }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label>Asignatura</label>
+                        <select [(ngModel)]="formulario.asignatura_id">
+                            <option value="0" disabled>Selecciona una asignatura</option>
+                            <option *ngFor="let asignatura of asignaturas" [value]="asignatura.asignatura_id">{{
+                                asignatura.asignatura_nombre }}</option>
+                        </select>
+                    </div>
+                </ng-container>
+
+                <p class="exito" *ngIf="mensajeExito">{{ mensajeExito }}</p>
+                <p class="error" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+                <div class="modal-acciones">
+                    <button class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+                    <button class="btn-guardar" (click)="guardarUsuario()" [disabled]="cargando">
+                        {{ cargando ? 'Guardando...' : 'Guardar' }}
+                    </button>
+                </div>
+            </div>
+        </div>

@@ -7,11 +7,9 @@ const {
     crearUsuario,
     editarUsuario,
     resetearContrasena,
-    obtenerRoles
+    obtenerRoles,
+    toggleActivoUsuario
 } = require('../controllers/usuarios.controller');
-
-// Todas las rutas de usuarios requieren token JWT válido
-// Solo el administrador puede acceder a estas rutas (el control de rol lo haremos en el frontend por ahora)
 
 // GET /usuarios -> obtiene todos los usuarios
 router.get('/', verificarToken, obtenerUsuarios);
@@ -27,5 +25,8 @@ router.put('/:id', verificarToken, editarUsuario);
 
 // POST /usuarios/:id/resetear-contrasena -> resetea la contraseña del usuario
 router.post('/:id/resetear-contrasena', verificarToken, resetearContrasena);
+
+// PATCH /usuarios/:id/toggle-activo -> activa o desactiva un usuario
+router.patch('/:id/toggle-activo', verificarToken, toggleActivoUsuario);
 
 module.exports = router;

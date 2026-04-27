@@ -1,1 +1,110 @@
-<p>dashboard works!</p>
+<!-- Layout principal del panel administrador -->
+<div class="layout">
+
+    <!-- Navbar lateral -->
+    <app-navbar></app-navbar>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+        <h1 class="titulo">Panel de Administración</h1>
+        <p class="subtitulo">Estado general del sistema ClassBook</p>
+
+        <!-- Tarjetas de resumen -->
+        <div class="tarjetas">
+            <div class="tarjeta">
+                <span class="tarjeta-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                        stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </span>
+                <h2 class="tarjeta-numero">{{ totalUsuarios }}</h2>
+                <p class="tarjeta-label">Total Usuarios</p>
+            </div>
+
+            <div class="tarjeta">
+                <span class="tarjeta-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                        stroke="#1a73e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                    </svg>
+                </span>
+                <h2 class="tarjeta-numero">{{ totalCursos }}</h2>
+                <p class="tarjeta-label">Cursos Activos</p>
+            </div>
+
+            <div class="tarjeta">
+                <span class="tarjeta-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                        stroke="#1e8e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                    </svg>
+                </span>
+                <h2 class="tarjeta-numero">{{ totalAsignaturas }}</h2>
+                <p class="tarjeta-label">Asignaturas</p>
+            </div>
+
+            <div class="tarjeta">
+                <span class="tarjeta-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                        stroke="#e37400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                </span>
+                <h2 class="tarjeta-numero">{{ totalHistorial }}</h2>
+                <p class="tarjeta-label">Registros en Historial</p>
+            </div>
+        </div>
+
+        <!-- Fila inferior -->
+        <div class="fila-inferior">
+
+            <!-- Estado del sistema -->
+            <div class="card">
+                <h3 class="card-titulo">Estado del Sistema</h3>
+                <div class="estado-item">
+                    <span class="estado-punto"
+                        [ngClass]="estadoSistema.baseDatos === 'Operativo' ? 'verde' : 'rojo'"></span>
+                    <span class="estado-label">Base de Datos</span>
+                    <span class="estado-valor" [ngClass]="estadoSistema.baseDatos === 'Operativo' ? 'verde' : 'rojo'">
+                        {{ estadoSistema.baseDatos }}
+                    </span>
+                </div>
+                <div class="estado-item">
+                    <span class="estado-punto verde"></span>
+                    <span class="estado-label">Servidor Backend</span>
+                    <span class="estado-valor verde">{{ estadoSistema.backend }}</span>
+                </div>
+                <div class="estado-item">
+                    <span class="estado-punto verde"></span>
+                    <span class="estado-label">Sistema de Autenticación</span>
+                    <span class="estado-valor verde">{{ estadoSistema.autenticacion }}</span>
+                </div>
+            </div>
+
+            <!-- Actividad reciente -->
+            <div class="card card-actividad">
+                <h3 class="card-titulo">Actividad Reciente del Sistema</h3>
+                <div *ngIf="actividadReciente.length === 0" class="sin-actividad">
+                    No hay actividad reciente registrada.
+                </div>
+                <div class="actividad-item" *ngFor="let item of actividadReciente">
+                    <span class="actividad-tipo" [ngClass]="item.historial_tipo_cambio.toLowerCase()">
+                        {{ item.historial_tipo_cambio }}
+                    </span>
+                    <span class="actividad-detalle">{{ item.historial_detalle_anterior }}</span>
+                    <span class="actividad-fecha">{{ item.historial_fecha_cambio | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>

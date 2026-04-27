@@ -1,40 +1,115 @@
-<!-- Formulario de cambio de contraseña -->
-<div class="cambiar-contrasena-container">
+<!-- Layout principal -->
+<div class="layout">
 
-    <h2 class="titulo">Cambiar Contraseña</h2>
+    <!-- Navbar lateral -->
+    <app-navbar></app-navbar>
 
-    <form (ngSubmit)="cambiarContrasena()">
+    <!-- Contenido principal -->
+    <main class="contenido">
 
-        <!-- Contraseña actual -->
-        <div class="campo">
-            <label for="contrasenaActual">Contraseña actual</label>
-            <input id="contrasenaActual" type="password" [(ngModel)]="contrasenaActual" name="contrasenaActual"
-                placeholder="••••••••" required />
+        <h1 class="titulo">Cambiar Contraseña</h1>
+        <p class="subtitulo">Actualiza tu contraseña de acceso al sistema</p>
+
+        <!-- Formulario -->
+        <div class="formulario-container">
+            <form (ngSubmit)="cambiarContrasena()">
+
+                <!-- Contraseña actual -->
+                <div class="campo">
+                    <label for="contrasenaActual">Contraseña Actual</label>
+                    <div class="input-wrapper">
+                        <input id="contrasenaActual" [type]="mostrarActual ? 'text' : 'password'"
+                            [(ngModel)]="contrasenaActual" name="contrasenaActual"
+                            placeholder="Ingresa tu contraseña actual" required />
+                        <button type="button" class="btn-ojo" (click)="mostrarActual = !mostrarActual">
+                            <svg *ngIf="!mostrarActual" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            <svg *ngIf="mostrarActual" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                <line x1="1" y1="1" x2="23" y2="23" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Nueva contraseña -->
+                <div class="campo">
+                    <label for="contrasenaNueva">Nueva Contraseña</label>
+                    <div class="input-wrapper">
+                        <input id="contrasenaNueva" [type]="mostrarNueva ? 'text' : 'password'"
+                            [(ngModel)]="contrasenaNueva" name="contrasenaNueva"
+                            placeholder="Ingresa tu nueva contraseña" required />
+                        <button type="button" class="btn-ojo" (click)="mostrarNueva = !mostrarNueva">
+                            <svg *ngIf="!mostrarNueva" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            <svg *ngIf="mostrarNueva" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                <line x1="1" y1="1" x2="23" y2="23" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Confirmar contraseña -->
+                <div class="campo">
+                    <label for="confirmarContrasena">Confirmar Nueva Contraseña</label>
+                    <div class="input-wrapper">
+                        <input id="confirmarContrasena" [type]="mostrarConfirmar ? 'text' : 'password'"
+                            [(ngModel)]="confirmarContrasena" name="confirmarContrasena"
+                            placeholder="Confirma tu nueva contraseña" required />
+                        <button type="button" class="btn-ojo" (click)="mostrarConfirmar = !mostrarConfirmar">
+                            <svg *ngIf="!mostrarConfirmar" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            <svg *ngIf="mostrarConfirmar" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                <line x1="1" y1="1" x2="23" y2="23" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <p class="error" *ngIf="mensajeError">{{ mensajeError }}</p>
+                <p class="exito" *ngIf="mensajeExito">{{ mensajeExito }}</p>
+
+                <button type="submit" [disabled]="cargando">
+                    {{ cargando ? 'Guardando...' : 'Guardar cambios' }}
+                </button>
+
+            </form>
+
+            <!-- Recomendaciones de seguridad -->
+            <div class="recomendaciones">
+                <p class="recomendaciones-titulo">Recomendaciones de seguridad</p>
+                <ul>
+                    <li>Usa una contraseña de al menos 8 caracteres</li>
+                    <li>Incluye mayúsculas, minúsculas, números y símbolos</li>
+                    <li>No compartas tu contraseña con nadie</li>
+                    <li>Cambia tu contraseña periódicamente</li>
+                </ul>
+            </div>
+
         </div>
 
-        <!-- Contraseña nueva -->
-        <div class="campo">
-            <label for="contrasenaNueva">Contraseña nueva</label>
-            <input id="contrasenaNueva" type="password" [(ngModel)]="contrasenaNueva" name="contrasenaNueva"
-                placeholder="••••••••" required />
-        </div>
-
-        <!-- Confirmar contraseña nueva -->
-        <div class="campo">
-            <label for="confirmarContrasena">Confirmar contraseña nueva</label>
-            <input id="confirmarContrasena" type="password" [(ngModel)]="confirmarContrasena" name="confirmarContrasena"
-                placeholder="••••••••" required />
-        </div>
-
-        <!-- Mensajes de feedback -->
-        <p class="error" *ngIf="mensajeError">{{ mensajeError }}</p>
-        <p class="exito" *ngIf="mensajeExito">{{ mensajeExito }}</p>
-
-        <!-- Botón -->
-        <button type="submit" [disabled]="cargando">
-            {{ cargando ? 'Guardando...' : 'Guardar cambios' }}
-        </button>
-
-    </form>
-
+    </main>
 </div>
