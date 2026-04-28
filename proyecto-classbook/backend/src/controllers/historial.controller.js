@@ -7,9 +7,13 @@ const obtenerHistorial = async (req, res) => {
     const { tipo, usuario_id, fecha_inicio, fecha_fin } = req.query;
 
     try {
-        // Construimos la consulta base con JOIN para obtener el nombre del usuario
+        // Construimos la consulta base con JOIN para obtener el nombre completo del usuario
         let query = `
-      SELECT h.*, u.usuario_nombre, u.usuario_apellido
+      SELECT h.*,
+        u.usuario_nombre,
+        u.usuario_segundo_nombre,
+        u.usuario_apellido,
+        u.usuario_segundo_apellido
       FROM historial_cambios h
       JOIN usuarios u ON h.historial_usuario_id = u.usuario_id
       WHERE 1=1

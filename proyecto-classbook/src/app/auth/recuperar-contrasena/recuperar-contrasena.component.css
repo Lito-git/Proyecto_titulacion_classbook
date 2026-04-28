@@ -118,6 +118,7 @@ button:disabled {
     text-decoration: underline;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
     .login-container {
         padding: 20px;

@@ -19,7 +19,7 @@ export class CalificacionesComponent implements OnInit {
   links = LINKS_DOCENTE;
   rutaBase = '/docente';
 
-  // Asignaciones del docente para los selectores
+  // Asignaciones del docente
   asignaciones: any[] = [];
   cursoSeleccionado: number = 0;
   asignaturaSeleccionada: number = 0;
@@ -28,7 +28,6 @@ export class CalificacionesComponent implements OnInit {
   calificaciones: any[] = [];
   estudiantes: any[] = [];
   mostrarTabla: boolean = false;
-  mostrarFormulario: boolean = false;
 
   // Formulario de registro
   formulario = {
@@ -48,6 +47,16 @@ export class CalificacionesComponent implements OnInit {
   ];
 
   tipoSeleccionado: any = null;
+
+  // Variables para el buscador de estudiantes en el formulario
+  busquedaEstudiante: string = '';
+  estudiantesFiltrados: any[] = [];
+  estudianteSeleccionado: any = null;
+  mostrarSugerencias: boolean = false;
+
+  // Variables para el buscador en la tabla
+  busquedaTabla: string = '';
+  calificacionesFiltradas: any[] = [];
 
   // Calificación en edición
   calificacionEditando: any = null;
@@ -81,7 +90,6 @@ export class CalificacionesComponent implements OnInit {
     this.http.get<any[]>(`${this.apiUrl}/docente/${id}/asignaciones`, { headers: this.getHeaders() }).subscribe({
       next: (data) => {
         this.asignaciones = data;
-        // Si solo tiene una asignación la seleccionamos y consultamos automáticamente
         if (data.length === 1) {
           this.cursoSeleccionado = data[0].curso_id;
           this.asignaturaSeleccionada = data[0].asignatura_id;
@@ -100,30 +108,65 @@ export class CalificacionesComponent implements OnInit {
     }
     this.mensajeError = '';
 
-    // Cargamos calificaciones
     this.http.get<any[]>(`${this.apiUrl}/docente/calificaciones/${this.cursoSeleccionado}/${this.asignaturaSeleccionada}`, { headers: this.getHeaders() }).subscribe({
       next: (data) => {
         this.calificaciones = data;
+        this.calificacionesFiltradas = data;
         this.mostrarTabla = true;
-        this.mostrarFormulario = false;
       },
       error: (err) => console.error('Error al cargar calificaciones', err)
     });
 
-    // Cargamos estudiantes del curso para el formulario de registro
     this.http.get<any[]>(`${this.apiUrl}/docente/curso/${this.cursoSeleccionado}/estudiantes`, { headers: this.getHeaders() }).subscribe({
       next: (data) => this.estudiantes = data,
       error: (err) => console.error('Error al cargar estudiantes', err)
     });
   }
 
-  // Muestra u oculta el formulario de registro
-  toggleFormulario() {
-    this.mostrarFormulario = !this.mostrarFormulario;
-    this.mensajeExito = '';
-    this.mensajeError = '';
-    this.formulario = { estudiante_id: 0, tipo: '', numero: 1, nota: '' };
-    this.tipoSeleccionado = null;
+  // Filtra estudiantes en el buscador del formulario
+  filtrarEstudiantes() {
+    const texto = this.busquedaEstudiante.toLowerCase();
+    if (texto.length < 2) {
+      this.estudiantesFiltrados = [];
+      this.mostrarSugerencias = false;
+      return;
+    }
+    this.estudiantesFiltrados = this.estudiantes.filter(est => {
+      const nombreCompleto = `${est.usuario_nombre} ${est.usuario_segundo_nombre || ''} ${est.usuario_apellido} ${est.usuario_segundo_apellido || ''}`.toLowerCase();
+      return nombreCompleto.includes(texto);
+    });
+    this.mostrarSugerencias = true;
+  }
+
+  // Selecciona un estudiante desde las sugerencias del buscador
+  seleccionarEstudiante(est: any) {
+    this.estudianteSeleccionado = est;
+    this.formulario.estudiante_id = est.estudiante_id;
+    this.busquedaEstudiante = `${est.usuario_nombre} ${est.usuario_segundo_nombre || ''} ${est.usuario_apellido} ${est.usuario_segundo_apellido || ''}`.trim();
+    this.mostrarSugerencias = false;
+    this.estudiantesFiltrados = [];
+  }
+
+  // Limpia la selección del estudiante
+  limpiarEstudiante() {
+    this.estudianteSeleccionado = null;
+    this.formulario.estudiante_id = 0;
+    this.busquedaEstudiante = '';
+    this.estudiantesFiltrados = [];
+    this.mostrarSugerencias = false;
+  }
+
+  // Filtra la tabla de calificaciones por nombre de estudiante
+  filtrarTabla() {
+    const texto = this.busquedaTabla.toLowerCase();
+    if (!texto) {
+      this.calificacionesFiltradas = this.calificaciones;
+      return;
+    }
+    this.calificacionesFiltradas = this.calificaciones.filter(est => {
+      const nombreCompleto = `${est.usuario_nombre} ${est.usuario_segundo_nombre || ''} ${est.usuario_apellido} ${est.usuario_segundo_apellido || ''}`.toLowerCase();
+      return nombreCompleto.includes(texto);
+    });
   }
 
   // Actualiza tipo y numero según el tipo de evaluación seleccionado
@@ -159,7 +202,8 @@ export class CalificacionesComponent implements OnInit {
       next: (res: any) => {
         this.mensajeExito = res.mensaje;
         this.cargando = false;
-        this.consultar(); // Recargamos la tabla
+        this.limpiarEstudiante();
+        this.consultar();
       },
       error: (err) => {
         this.mensajeError = err.error?.mensaje || 'Error al registrar calificación.';
@@ -192,7 +236,7 @@ export class CalificacionesComponent implements OnInit {
       next: (res: any) => {
         this.mensajeExito = res.mensaje;
         this.calificacionEditando = null;
-        this.consultar(); // Recargamos la tabla
+        this.consultar();
       },
       error: (err) => {
         this.mensajeError = err.error?.mensaje || 'Error al modificar calificación.';

@@ -34,6 +34,16 @@ export class AnotacionesComponent implements OnInit {
     descripcion: ''
   };
 
+  // Variables para el buscador de estudiantes en el formulario
+  busquedaEstudiante: string = '';
+  estudiantesFiltrados: any[] = [];
+  estudianteSeleccionado: any = null;
+  mostrarSugerencias: boolean = false;
+
+  // Variable para el buscador en la lista de anotaciones
+  busquedaAnotaciones: string = '';
+  anotacionesFiltradas: any[] = [];
+
   mensajeExito: string = '';
   mensajeError: string = '';
   cargando: boolean = false;
@@ -59,11 +69,8 @@ export class AnotacionesComponent implements OnInit {
   // Carga las anotaciones y los estudiantes del curso del docente
   cargarDatos() {
     const id = this.getDocenteId();
-
-    // Cargamos anotaciones del docente
     this.cargarAnotaciones();
 
-    // Obtenemos el curso asignado al docente para cargar sus estudiantes
     this.http.get<any[]>(`${this.apiUrl}/docente/${id}/asignaciones`, { headers: this.getHeaders() }).subscribe({
       next: (data) => {
         if (data.length > 0) {
@@ -91,7 +98,11 @@ export class AnotacionesComponent implements OnInit {
       : `${this.apiUrl}/docente/${id}/anotaciones?tipo=${this.filtroActivo}`;
 
     this.http.get<any[]>(url, { headers: this.getHeaders() }).subscribe({
-      next: (data) => this.anotaciones = data,
+      next: (data) => {
+        this.anotaciones = data;
+        this.anotacionesFiltradas = data;
+        this.filtrarAnotaciones();
+      },
       error: (err) => console.error('Error al cargar anotaciones', err)
     });
   }
@@ -100,6 +111,52 @@ export class AnotacionesComponent implements OnInit {
   cambiarFiltro(filtro: string) {
     this.filtroActivo = filtro;
     this.cargarAnotaciones();
+  }
+
+  // Filtra estudiantes en el buscador del formulario
+  filtrarEstudiantes() {
+    const texto = this.busquedaEstudiante.toLowerCase();
+    if (texto.length < 2) {
+      this.estudiantesFiltrados = [];
+      this.mostrarSugerencias = false;
+      return;
+    }
+    this.estudiantesFiltrados = this.estudiantes.filter(est => {
+      const nombreCompleto = `${est.usuario_nombre} ${est.usuario_segundo_nombre || ''} ${est.usuario_apellido} ${est.usuario_segundo_apellido || ''}`.toLowerCase();
+      return nombreCompleto.includes(texto);
+    });
+    this.mostrarSugerencias = true;
+  }
+
+  // Selecciona un estudiante desde las sugerencias
+  seleccionarEstudiante(est: any) {
+    this.estudianteSeleccionado = est;
+    this.formulario.estudiante_id = est.estudiante_id;
+    this.busquedaEstudiante = `${est.usuario_nombre} ${est.usuario_segundo_nombre || ''} ${est.usuario_apellido} ${est.usuario_segundo_apellido || ''}`.trim();
+    this.mostrarSugerencias = false;
+    this.estudiantesFiltrados = [];
+  }
+
+  // Limpia la selección del estudiante
+  limpiarEstudiante() {
+    this.estudianteSeleccionado = null;
+    this.formulario.estudiante_id = 0;
+    this.busquedaEstudiante = '';
+    this.estudiantesFiltrados = [];
+    this.mostrarSugerencias = false;
+  }
+
+  // Filtra la lista de anotaciones por nombre de estudiante
+  filtrarAnotaciones() {
+    const texto = this.busquedaAnotaciones.toLowerCase();
+    if (!texto) {
+      this.anotacionesFiltradas = this.anotaciones;
+      return;
+    }
+    this.anotacionesFiltradas = this.anotaciones.filter(a => {
+      const nombreCompleto = `${a.usuario_nombre} ${a.usuario_segundo_nombre || ''} ${a.usuario_apellido} ${a.usuario_segundo_apellido || ''}`.toLowerCase();
+      return nombreCompleto.includes(texto);
+    });
   }
 
   // Registra una nueva anotación
@@ -121,6 +178,7 @@ export class AnotacionesComponent implements OnInit {
       next: (res: any) => {
         this.mensajeExito = res.mensaje;
         this.formulario = { estudiante_id: 0, tipo: 'positiva', descripcion: '' };
+        this.limpiarEstudiante();
         this.cargarAnotaciones();
         this.cargando = false;
       },

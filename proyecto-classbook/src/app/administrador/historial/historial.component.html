@@ -42,12 +42,22 @@
                 </div>
                 <div class="campo">
                     <label>Usuario</label>
-                    <select [(ngModel)]="filtroUsuario" (change)="aplicarFiltros()">
-                        <option value="">Todos</option>
-                        <option *ngFor="let u of usuarios" [value]="u.usuario_id">
-                            {{ u.usuario_nombre }} {{ u.usuario_apellido }}
-                        </option>
-                    </select>
+                    <div class="buscador-container">
+                        <input type="text" [(ngModel)]="busquedaUsuario" (input)="filtrarUsuarios()"
+                            placeholder="Buscar usuario..." [disabled]="!!usuarioSeleccionado" />
+                        <button class="btn-limpiar-est" *ngIf="usuarioSeleccionado"
+                            (click)="limpiarUsuario()">✗</button>
+                        <div class="sugerencias" *ngIf="mostrarSugerencias && usuariosFiltrados.length > 0">
+                            <div class="sugerencia-item" *ngFor="let u of usuariosFiltrados"
+                                (click)="seleccionarUsuario(u)">
+                                {{ u.usuario_nombre }} {{ u.usuario_segundo_nombre || '' }} {{ u.usuario_apellido }} {{
+                                u.usuario_segundo_apellido || '' }}
+                            </div>
+                        </div>
+                        <div class="sugerencias" *ngIf="mostrarSugerencias && usuariosFiltrados.length === 0">
+                            <div class="sugerencia-vacia">No se encontraron usuarios</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="campo">
                     <label>Fecha Inicio</label>
@@ -93,14 +103,15 @@
                         </svg>
                         {{ item.historial_tabla_afectada }}
                     </span>
-                    <!-- Usuario -->
+                    <!-- Nombre completo del usuario que realizó el cambio -->
                     <span class="meta-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                             <circle cx="12" cy="7" r="4" />
                         </svg>
-                        {{ item.usuario_nombre }} {{ item.usuario_apellido }}
+                        {{ item.usuario_nombre }} {{ item.usuario_segundo_nombre || '' }} {{ item.usuario_apellido }} {{
+                        item.usuario_segundo_apellido || '' }}
                     </span>
                     <!-- Fecha -->
                     <span class="meta-item">

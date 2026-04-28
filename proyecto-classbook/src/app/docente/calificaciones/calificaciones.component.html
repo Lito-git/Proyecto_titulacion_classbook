@@ -15,15 +15,30 @@
         <div class="formulario-card" *ngIf="mostrarTabla">
             <h3 class="card-titulo">Registrar Nueva Calificación</h3>
             <div class="formulario-grid">
+
+                <!-- Buscador de estudiante -->
                 <div class="campo">
                     <label>Estudiante</label>
-                    <select [(ngModel)]="formulario.estudiante_id">
-                        <option value="0" disabled>Seleccionar estudiante</option>
-                        <option *ngFor="let est of estudiantes" [value]="est.estudiante_id">
-                            {{ est.usuario_apellido }} {{ est.usuario_nombre }}
-                        </option>
-                    </select>
+                    <div class="buscador-container">
+                        <input type="text" [(ngModel)]="busquedaEstudiante" (input)="filtrarEstudiantes()"
+                            placeholder="Buscar estudiante..." [disabled]="!!estudianteSeleccionado" />
+                        <button class="btn-limpiar-est" *ngIf="estudianteSeleccionado"
+                            (click)="limpiarEstudiante()">✗</button>
+                        <!-- Sugerencias -->
+                        <div class="sugerencias" *ngIf="mostrarSugerencias && estudiantesFiltrados.length > 0">
+                            <div class="sugerencia-item" *ngFor="let est of estudiantesFiltrados"
+                                (click)="seleccionarEstudiante(est)">
+                                {{ est.usuario_nombre }} {{ est.usuario_segundo_nombre || '' }} {{ est.usuario_apellido
+                                }} {{ est.usuario_segundo_apellido || '' }}
+                            </div>
+                        </div>
+                        <div class="sugerencias" *ngIf="mostrarSugerencias && estudiantesFiltrados.length === 0">
+                            <div class="sugerencia-vacia">No se encontraron estudiantes</div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Tipo de evaluación -->
                 <div class="campo">
                     <label>Tipo de Evaluación</label>
                     <select [(ngModel)]="tipoSeleccionado" (change)="onTipoChange()">
@@ -31,6 +46,8 @@
                         <option *ngFor="let tipo of tiposEvaluacion" [ngValue]="tipo">{{ tipo.label }}</option>
                     </select>
                 </div>
+
+                <!-- Nota -->
                 <div class="campo">
                     <label>Calificación (2.0 - 7.0)</label>
                     <input type="number" [(ngModel)]="formulario.nota" min="2.0" max="7.0" step="0.1"
@@ -52,8 +69,9 @@
                 Calificaciones - {{ asignaciones[0]?.curso_nombre }} - {{ asignaciones[0]?.asignatura_nombre }}
             </h3>
 
-            <p class="exito" *ngIf="mensajeExito">{{ mensajeExito }}</p>
-            <p class="error" *ngIf="mensajeError">{{ mensajeError }}</p>
+            <!-- Buscador de la tabla -->
+            <input class="buscador-tabla" type="text" placeholder="Buscar estudiante en la tabla..."
+                [(ngModel)]="busquedaTabla" (input)="filtrarTabla()" />
 
             <div class="tabla-container">
                 <table class="tabla">
@@ -69,8 +87,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let est of calificaciones">
-                            <td>{{ est.usuario_nombre }} {{ est.usuario_apellido }}</td>
+                        <tr *ngFor="let est of calificacionesFiltradas">
+
+                            <!-- Nombre completo -->
+                            <td>
+                                {{ est.usuario_nombre }}
+                                {{ est.usuario_segundo_nombre || '' }}
+                                {{ est.usuario_apellido }}
+                                {{ est.usuario_segundo_apellido || '' }}
+                            </td>
 
                             <!-- Prueba 1 -->
                             <td>

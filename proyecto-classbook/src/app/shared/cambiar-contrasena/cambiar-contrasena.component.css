@@ -154,6 +154,7 @@ button:disabled {
     background: none;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
     .contenido {
         margin-left: 0;

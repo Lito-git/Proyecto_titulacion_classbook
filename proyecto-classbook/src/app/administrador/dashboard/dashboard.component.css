@@ -187,6 +187,7 @@
     color: #d93025;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
     .contenido {
         margin-left: 0;

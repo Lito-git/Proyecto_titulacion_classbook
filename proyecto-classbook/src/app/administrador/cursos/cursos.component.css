@@ -280,6 +280,7 @@
     border-color: #7c3aed;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
     .contenido {
         margin-left: 0;

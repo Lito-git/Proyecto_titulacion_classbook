@@ -26,9 +26,15 @@ export class HistorialComponent implements OnInit {
 
   // Variables de filtros
   filtroTipo: string = '';
-  filtroUsuario: string = '';
   filtroFechaInicio: string = '';
   filtroFechaFin: string = '';
+
+  // Variables para el buscador de usuarios
+  busquedaUsuario: string = '';
+  usuariosFiltrados: any[] = [];
+  usuarioSeleccionado: any = null;
+  mostrarSugerencias: boolean = false;
+  filtroUsuario: string = '';
 
   private apiUrl = 'http://localhost:3000';
 
@@ -53,11 +59,46 @@ export class HistorialComponent implements OnInit {
     });
   }
 
-  // Carga los usuarios para el filtro de usuario
+  // Carga los usuarios para el buscador
   cargarUsuarios() {
     this.http.get<any[]>(`${this.apiUrl}/usuarios`, { headers: this.getHeaders() }).subscribe({
       next: (data) => this.usuarios = data
     });
+  }
+
+  // Filtra usuarios en el buscador
+  filtrarUsuarios() {
+    const texto = this.busquedaUsuario.toLowerCase();
+    if (texto.length < 2) {
+      this.usuariosFiltrados = [];
+      this.mostrarSugerencias = false;
+      return;
+    }
+    this.usuariosFiltrados = this.usuarios.filter(u => {
+      const nombreCompleto = `${u.usuario_nombre} ${u.usuario_segundo_nombre || ''} ${u.usuario_apellido} ${u.usuario_segundo_apellido || ''}`.toLowerCase();
+      return nombreCompleto.includes(texto);
+    });
+    this.mostrarSugerencias = true;
+  }
+
+  // Selecciona un usuario desde las sugerencias
+  seleccionarUsuario(usuario: any) {
+    this.usuarioSeleccionado = usuario;
+    this.filtroUsuario = usuario.usuario_id;
+    this.busquedaUsuario = `${usuario.usuario_nombre} ${usuario.usuario_segundo_nombre || ''} ${usuario.usuario_apellido} ${usuario.usuario_segundo_apellido || ''}`.trim();
+    this.mostrarSugerencias = false;
+    this.usuariosFiltrados = [];
+    this.aplicarFiltros();
+  }
+
+  // Limpia la selección del usuario
+  limpiarUsuario() {
+    this.usuarioSeleccionado = null;
+    this.filtroUsuario = '';
+    this.busquedaUsuario = '';
+    this.usuariosFiltrados = [];
+    this.mostrarSugerencias = false;
+    this.aplicarFiltros();
   }
 
   // Aplica los filtros seleccionados enviando query params al backend
@@ -80,10 +121,9 @@ export class HistorialComponent implements OnInit {
   // Limpia todos los filtros y restaura el historial completo
   limpiarFiltros() {
     this.filtroTipo = '';
-    this.filtroUsuario = '';
     this.filtroFechaInicio = '';
     this.filtroFechaFin = '';
-    this.historialFiltrado = this.historial;
+    this.limpiarUsuario();
   }
 
   // Formatea la fecha al formato dd-mm-yyyy hh:mm:ss a.m/p.m

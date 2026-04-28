@@ -13,25 +13,16 @@ const generarContrasenaTemp = () => {
 const obtenerUsuarios = async (req, res) => {
     try {
         const [usuarios] = await db.query(
-            `SELECT 
-        u.usuario_id, u.usuario_nombre, u.usuario_apellido,
-        u.usuario_email, u.usuario_fecha_registro, u.usuario_activo,
-        u.usuario_rol_id, r.rol_nombre,
-        -- Curso del estudiante
-        c_est.curso_nombre AS estudiante_curso,
-        -- Curso y asignatura del docente
-        c_doc.curso_nombre AS docente_curso,
-        a.asignatura_nombre AS docente_asignatura
-      FROM usuarios u
-      JOIN roles r ON u.usuario_rol_id = r.rol_id
-      -- JOIN para estudiantes
-      LEFT JOIN estudiantes e ON e.estudiante_usuario_id = u.usuario_id
-      LEFT JOIN cursos c_est ON c_est.curso_id = e.estudiante_curso_id
-      -- JOIN para docentes
-      LEFT JOIN docente_asignatura da ON da.docente_usuario_id = u.usuario_id
-      LEFT JOIN cursos c_doc ON c_doc.curso_id = da.curso_id
-      LEFT JOIN asignaturas a ON a.asignatura_id = da.asignatura_id
-      ORDER BY u.usuario_id ASC`
+            `SELECT u.usuario_id, u.usuario_nombre, u.usuario_segundo_nombre, u.usuario_apellido, u.usuario_segundo_apellido, u.usuario_email, u.usuario_fecha_registro, u.usuario_activo,
+        u.usuario_rol_id, r.rol_nombre, c_est.curso_nombre AS estudiante_curso, c_doc.curso_nombre AS docente_curso, a.asignatura_nombre AS docente_asignatura
+       FROM usuarios u
+       JOIN roles r ON u.usuario_rol_id = r.rol_id
+       LEFT JOIN estudiantes e ON e.estudiante_usuario_id = u.usuario_id
+       LEFT JOIN cursos c_est ON c_est.curso_id = e.estudiante_curso_id
+       LEFT JOIN docente_asignatura da ON da.docente_usuario_id = u.usuario_id
+       LEFT JOIN cursos c_doc ON c_doc.curso_id = da.curso_id
+       LEFT JOIN asignaturas a ON a.asignatura_id = da.asignatura_id
+       ORDER BY u.usuario_id ASC`
         );
         res.json(usuarios);
     } catch (error) {
@@ -44,10 +35,9 @@ const obtenerUsuarios = async (req, res) => {
 // Si es docente, registra en docente_asignatura
 // Si es estudiante, registra en estudiantes
 const crearUsuario = async (req, res) => {
-    const { nombre, apellido, email, rol_id, rut, fecha_nacimiento, curso_id, asignatura_id } = req.body;
+    const { nombre, segundo_nombre, apellido, segundo_apellido, email, rol_id, rut, fecha_nacimiento, curso_id, asignatura_id } = req.body;
 
     try {
-        // Verificamos que el email no esté registrado
         const [existe] = await db.query(
             'SELECT usuario_id FROM usuarios WHERE usuario_email = ?',
             [email]
@@ -57,24 +47,19 @@ const crearUsuario = async (req, res) => {
             return res.status(400).json({ mensaje: 'El correo ya está registrado.' });
         }
 
-        // Generamos y encriptamos la contraseña temporal
         const contrasenaTemp = generarContrasenaTemp();
         const hash = await bcrypt.hash(contrasenaTemp, 10);
 
-        // Insertamos el nuevo usuario en la BD
         const [resultado] = await db.query(
-            `INSERT INTO usuarios (usuario_nombre, usuario_apellido, usuario_email, usuario_contrasena, usuario_rol_id) 
-       VALUES (?, ?, ?, ?, ?)`,
-            [nombre, apellido, email, hash, rol_id]
+            `INSERT INTO usuarios (usuario_nombre, usuario_segundo_nombre, usuario_apellido, usuario_segundo_apellido, usuario_email, usuario_contrasena, usuario_rol_id) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [nombre, segundo_nombre || null, apellido, segundo_apellido || null, email, hash, rol_id]
         );
 
         const nuevoUsuarioId = resultado.insertId;
-
-        // Obtenemos el nombre del rol para determinar acciones adicionales
         const [roles] = await db.query('SELECT rol_nombre FROM roles WHERE rol_id = ?', [rol_id]);
         const rolNombre = roles[0].rol_nombre;
 
-        // Si es estudiante, registramos en la tabla estudiantes
         if (rolNombre === 'estudiante') {
             if (!rut || !curso_id) {
                 return res.status(400).json({ mensaje: 'El RUT y el curso son obligatorios para estudiantes.' });
@@ -86,7 +71,6 @@ const crearUsuario = async (req, res) => {
             );
         }
 
-        // Si es docente, registramos en la tabla docente_asignatura
         if (rolNombre === 'docente') {
             if (!curso_id || !asignatura_id) {
                 return res.status(400).json({ mensaje: 'El curso y la asignatura son obligatorios para docentes.' });
@@ -98,9 +82,7 @@ const crearUsuario = async (req, res) => {
             );
         }
 
-        // Enviamos la contraseña temporal por correo
         await enviarContrasenaTemp(email, nombre, contrasenaTemp);
-
         res.json({ mensaje: `Usuario creado exitosamente. Se envió la contraseña temporal a ${email}.` });
 
     } catch (error) {
@@ -111,14 +93,14 @@ const crearUsuario = async (req, res) => {
 // Editar un usuario existente
 const editarUsuario = async (req, res) => {
     const { id } = req.params;
-    const { nombre, apellido, email, rol_id } = req.body;
+    const { nombre, segundo_nombre, apellido, segundo_apellido, email, rol_id } = req.body;
 
     try {
         await db.query(
             `UPDATE usuarios 
-       SET usuario_nombre = ?, usuario_apellido = ?, usuario_email = ?, usuario_rol_id = ?
+       SET usuario_nombre = ?, usuario_segundo_nombre = ?, usuario_apellido = ?, usuario_segundo_apellido = ?, usuario_email = ?, usuario_rol_id = ?
        WHERE usuario_id = ?`,
-            [nombre, apellido, email, rol_id, id]
+            [nombre, segundo_nombre || null, apellido, segundo_apellido || null, email, rol_id, id]
         );
         res.json({ mensaje: 'Usuario actualizado correctamente.' });
     } catch (error) {

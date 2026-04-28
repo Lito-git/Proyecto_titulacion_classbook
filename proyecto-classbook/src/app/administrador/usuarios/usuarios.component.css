@@ -318,6 +318,7 @@
     cursor: not-allowed;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
     .contenido {
         margin-left: 0;
@@ -332,5 +333,11 @@
 
     .tabla-container {
         overflow-x: auto;
+    }
+
+    .modal {
+        padding: 20px;
+        margin: 16px;
+        max-width: 100%;
     }
 }

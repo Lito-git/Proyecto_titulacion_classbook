@@ -2,10 +2,8 @@
 const db = require('../config/db');
 
 // Obtener las asignaciones del docente (curso + asignatura)
-// Un docente puede tener múltiples asignaciones
 const obtenerAsignaciones = async (req, res) => {
     const { id } = req.params;
-
     try {
         const [asignaciones] = await db.query(
             `SELECT 
@@ -33,13 +31,14 @@ const obtenerAsignaciones = async (req, res) => {
 // Obtener los estudiantes de un curso específico
 const obtenerEstudiantesPorCurso = async (req, res) => {
     const { curso_id } = req.params;
-
     try {
         const [estudiantes] = await db.query(
             `SELECT 
         e.estudiante_id,
         u.usuario_nombre,
+        u.usuario_segundo_nombre,
         u.usuario_apellido,
+        u.usuario_segundo_apellido,
         e.estudiante_rut
        FROM estudiantes e
        JOIN usuarios u ON u.usuario_id = e.estudiante_usuario_id
@@ -57,14 +56,15 @@ const obtenerEstudiantesPorCurso = async (req, res) => {
 // Obtener calificaciones de un curso y asignatura específicos
 const obtenerCalificaciones = async (req, res) => {
     const { curso_id, asignatura_id } = req.params;
-
     try {
         // Obtenemos todos los estudiantes del curso
         const [estudiantes] = await db.query(
             `SELECT 
         e.estudiante_id,
         u.usuario_nombre,
-        u.usuario_apellido
+        u.usuario_segundo_nombre,
+        u.usuario_apellido,
+        u.usuario_segundo_apellido
        FROM estudiantes e
        JOIN usuarios u ON u.usuario_id = e.estudiante_usuario_id
        WHERE e.estudiante_curso_id = ?
@@ -94,7 +94,7 @@ const obtenerCalificaciones = async (req, res) => {
 // Registrar una nueva calificación
 const registrarCalificacion = async (req, res) => {
     const { estudiante_id, asignatura_id, curso_id, tipo, numero, nota } = req.body;
-    const profesor_id = req.usuario.id; // Viene del token JWT
+    const profesor_id = req.usuario.id;
 
     try {
         // Verificamos que la nota esté en el rango válido (2.0 - 7.0)
@@ -109,16 +109,20 @@ const registrarCalificacion = async (req, res) => {
             [estudiante_id, asignatura_id, curso_id, profesor_id, tipo, numero, nota]
         );
 
-        // Registramos en el historial de cambios
+        // Obtenemos datos del estudiante para el historial incluyendo nombre completo
         const [estudiante] = await db.query(
-            `SELECT u.usuario_nombre, u.usuario_apellido 
+            `SELECT u.usuario_nombre, u.usuario_segundo_nombre, u.usuario_apellido, u.usuario_segundo_apellido
        FROM estudiantes e JOIN usuarios u ON u.usuario_id = e.estudiante_usuario_id
        WHERE e.estudiante_id = ?`,
             [estudiante_id]
         );
-        const [asignatura] = await db.query('SELECT asignatura_nombre FROM asignaturas WHERE asignatura_id = ?', [asignatura_id]);
+        const [asignatura] = await db.query(
+            'SELECT asignatura_nombre FROM asignaturas WHERE asignatura_id = ?',
+            [asignatura_id]
+        );
 
-        const nombreEst = `${estudiante[0].usuario_nombre} ${estudiante[0].usuario_apellido}`;
+        // Construimos el nombre completo del estudiante
+        const nombreEst = `${estudiante[0].usuario_nombre}${estudiante[0].usuario_segundo_nombre ? ' ' + estudiante[0].usuario_segundo_nombre : ''} ${estudiante[0].usuario_apellido}${estudiante[0].usuario_segundo_apellido ? ' ' + estudiante[0].usuario_segundo_apellido : ''}`;
         const detalle = `Registró calificación de ${nombreEst} en ${asignatura[0].asignatura_nombre} - ${tipo} ${numero}|Nota: ${nota}`;
 
         await db.query(
@@ -148,9 +152,9 @@ const modificarCalificacion = async (req, res) => {
             return res.status(400).json({ mensaje: 'La nota debe estar entre 2.0 y 7.0.' });
         }
 
-        // Obtenemos la nota anterior para el historial
+        // Obtenemos la nota anterior y datos completos para el historial
         const [calActual] = await db.query(
-            `SELECT c.*, u.usuario_nombre, u.usuario_apellido, a.asignatura_nombre
+            `SELECT c.*, u.usuario_nombre, u.usuario_segundo_nombre, u.usuario_apellido, u.usuario_segundo_apellido, a.asignatura_nombre
        FROM calificaciones c
        JOIN estudiantes e ON e.estudiante_id = c.calificacion_estudiante_id
        JOIN usuarios u ON u.usuario_id = e.estudiante_usuario_id
@@ -172,8 +176,8 @@ const modificarCalificacion = async (req, res) => {
             [nota, id]
         );
 
-        // Registramos en el historial de cambios
-        const nombreEst = `${cal.usuario_nombre} ${cal.usuario_apellido}`;
+        // Construimos el nombre completo del estudiante
+        const nombreEst = `${cal.usuario_nombre}${cal.usuario_segundo_nombre ? ' ' + cal.usuario_segundo_nombre : ''} ${cal.usuario_apellido}${cal.usuario_segundo_apellido ? ' ' + cal.usuario_segundo_apellido : ''}`;
         const detalle = `Modificó calificación de ${nombreEst} en ${cal.asignatura_nombre} - ${cal.calificacion_tipo} ${cal.calificacion_numero}|Valor anterior: ${notaAnterior} → Nuevo valor: ${nota}`;
 
         await db.query(
@@ -201,10 +205,14 @@ const obtenerAnotaciones = async (req, res) => {
         an.anotacion_descripcion,
         an.anotacion_fecha,
         u.usuario_nombre,
+        u.usuario_segundo_nombre,
         u.usuario_apellido,
+        u.usuario_segundo_apellido,
         c.curso_nombre,
         up.usuario_nombre AS profesor_nombre,
-        up.usuario_apellido AS profesor_apellido
+        up.usuario_segundo_nombre AS profesor_segundo_nombre,
+        up.usuario_apellido AS profesor_apellido,
+        up.usuario_segundo_apellido AS profesor_segundo_apellido
       FROM anotaciones an
       JOIN estudiantes e ON e.estudiante_id = an.anotacion_estudiante_id
       JOIN usuarios u ON u.usuario_id = e.estudiante_usuario_id
@@ -241,15 +249,16 @@ const registrarAnotacion = async (req, res) => {
             [estudiante_id, profesor_id, tipo, descripcion]
         );
 
-        // Registramos en el historial de cambios
+        // Obtenemos datos del estudiante para el historial incluyendo nombre completo
         const [estudiante] = await db.query(
-            `SELECT u.usuario_nombre, u.usuario_apellido
+            `SELECT u.usuario_nombre, u.usuario_segundo_nombre, u.usuario_apellido, u.usuario_segundo_apellido
        FROM estudiantes e JOIN usuarios u ON u.usuario_id = e.estudiante_usuario_id
        WHERE e.estudiante_id = ?`,
             [estudiante_id]
         );
 
-        const nombreEst = `${estudiante[0].usuario_nombre} ${estudiante[0].usuario_apellido}`;
+        // Construimos el nombre completo del estudiante
+        const nombreEst = `${estudiante[0].usuario_nombre}${estudiante[0].usuario_segundo_nombre ? ' ' + estudiante[0].usuario_segundo_nombre : ''} ${estudiante[0].usuario_apellido}${estudiante[0].usuario_segundo_apellido ? ' ' + estudiante[0].usuario_segundo_apellido : ''}`;
         const detalle = `Registró anotación ${tipo} para ${nombreEst}|${descripcion}`;
 
         await db.query(
@@ -267,7 +276,6 @@ const registrarAnotacion = async (req, res) => {
 // Obtener resumen para el dashboard del docente
 const obtenerResumenDocente = async (req, res) => {
     const { id } = req.params;
-
     try {
         // Total estudiantes en los cursos del docente
         const [totalEst] = await db.query(

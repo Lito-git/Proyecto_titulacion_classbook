@@ -33,7 +33,9 @@ export class UsuariosComponent implements OnInit {
   formulario = {
     id: 0,
     nombre: '',
+    segundo_nombre: '',
     apellido: '',
+    segundo_apellido: '',
     email: '',
     rol_id: 0,
     rol_nombre: '',
@@ -91,17 +93,30 @@ export class UsuariosComponent implements OnInit {
 
   filtrar() {
     const texto = this.busqueda.toLowerCase();
-    this.usuariosFiltrados = this.usuarios.filter(u =>
-      u.usuario_nombre.toLowerCase().includes(texto) ||
-      u.usuario_apellido.toLowerCase().includes(texto) ||
-      u.usuario_email.toLowerCase().includes(texto) ||
-      u.rol_nombre.toLowerCase().includes(texto)
-    );
+    this.usuariosFiltrados = this.usuarios.filter(u => {
+      const nombreCompleto = `${u.usuario_nombre} ${u.usuario_segundo_nombre || ''} ${u.usuario_apellido} ${u.usuario_segundo_apellido || ''}`.toLowerCase();
+      return nombreCompleto.includes(texto) ||
+        u.usuario_email.toLowerCase().includes(texto) ||
+        u.rol_nombre.toLowerCase().includes(texto);
+    });
   }
 
   abrirModalCrear() {
     this.modoEdicion = false;
-    this.formulario = { id: 0, nombre: '', apellido: '', email: '', rol_id: 0, rol_nombre: '', rut: '', fecha_nacimiento: '', curso_id: 0, asignatura_id: 0 };
+    this.formulario = {
+      id: 0,
+      nombre: '',
+      segundo_nombre: '',
+      apellido: '',
+      segundo_apellido: '',
+      email: '',
+      rol_id: 0,
+      rol_nombre: '',
+      rut: '',
+      fecha_nacimiento: '',
+      curso_id: 0,
+      asignatura_id: 0
+    };
     this.mensajeExito = '';
     this.mensajeError = '';
     this.mostrarModal = true;
@@ -112,7 +127,9 @@ export class UsuariosComponent implements OnInit {
     this.formulario = {
       id: usuario.usuario_id,
       nombre: usuario.usuario_nombre,
+      segundo_nombre: usuario.usuario_segundo_nombre || '',
       apellido: usuario.usuario_apellido,
+      segundo_apellido: usuario.usuario_segundo_apellido || '',
       email: usuario.usuario_email,
       rol_id: usuario.usuario_rol_id,
       rol_nombre: usuario.rol_nombre,
@@ -133,14 +150,38 @@ export class UsuariosComponent implements OnInit {
   }
 
   guardarUsuario() {
+    // Validaciones básicas en el frontend
+    if (!this.formulario.nombre.trim() || !this.formulario.apellido.trim() || !this.formulario.email.trim() || this.formulario.rol_id === 0) {
+      this.mensajeError = 'Primer nombre, primer apellido, correo y rol son obligatorios.';
+      return;
+    }
+
+    // Validaciones adicionales para estudiante
+    if (!this.modoEdicion && this.getRolNombre() === 'estudiante') {
+      if (!this.formulario.rut.trim() || this.formulario.curso_id === 0) {
+        this.mensajeError = 'RUT y curso son obligatorios para estudiantes.';
+        return;
+      }
+    }
+
+    // Validaciones adicionales para docente
+    if (!this.modoEdicion && this.getRolNombre() === 'docente') {
+      if (this.formulario.curso_id === 0 || this.formulario.asignatura_id === 0) {
+        this.mensajeError = 'Curso y asignatura son obligatorios para docentes.';
+        return;
+      }
+    }
+
     this.mensajeExito = '';
     this.mensajeError = '';
     this.cargando = true;
 
     if (this.modoEdicion) {
       this.http.put(`${this.apiUrl}/usuarios/${this.formulario.id}`,
-        { nombre: this.formulario.nombre, apellido: this.formulario.apellido, email: this.formulario.email, rol_id: this.formulario.rol_id },
-        { headers: this.getHeaders() }
+        {
+          nombre: this.formulario.nombre, segundo_nombre: this.formulario.segundo_nombre, apellido: this.formulario.apellido, segundo_apellido: this.formulario.segundo_apellido,
+          email: this.formulario.email, rol_id: this.formulario.rol_id
+        }, { headers: this.getHeaders() }
       ).subscribe({
         next: (res: any) => { this.mensajeExito = res.mensaje; this.cargarUsuarios(); this.cargando = false; },
         error: (err) => { this.mensajeError = err.error?.mensaje || 'Error al editar usuario.'; this.cargando = false; }
@@ -148,7 +189,9 @@ export class UsuariosComponent implements OnInit {
     } else {
       const body: any = {
         nombre: this.formulario.nombre,
+        segundo_nombre: this.formulario.segundo_nombre,
         apellido: this.formulario.apellido,
+        segundo_apellido: this.formulario.segundo_apellido,
         email: this.formulario.email,
         rol_id: this.formulario.rol_id,
         rut: this.formulario.rut,

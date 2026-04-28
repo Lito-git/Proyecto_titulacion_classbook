@@ -40,7 +40,15 @@
                 <tbody>
                     <tr *ngFor="let usuario of usuariosFiltrados"
                         [ngClass]="{'inactivo': usuario.usuario_activo === 0}">
-                        <td>{{ usuario.usuario_nombre }} {{ usuario.usuario_apellido }}</td>
+
+                        <!-- Nombre completo -->
+                        <td>
+                            {{ usuario.usuario_nombre }}
+                            {{ usuario.usuario_segundo_nombre ? usuario.usuario_segundo_nombre + ' ' : '' }}
+                            {{ usuario.usuario_apellido }}
+                            {{ usuario.usuario_segundo_apellido || '' }}
+                        </td>
+
                         <td>{{ usuario.usuario_email }}</td>
                         <td>
                             <span class="badge" [ngClass]="usuario.rol_nombre">
@@ -118,12 +126,20 @@
                 <h2 class="modal-titulo">{{ modoEdicion ? 'Editar Usuario' : 'Crear Usuario' }}</h2>
 
                 <div class="campo">
-                    <label>Nombre</label>
-                    <input type="text" [(ngModel)]="formulario.nombre" placeholder="Nombre" />
+                    <label>Primer Nombre</label>
+                    <input type="text" [(ngModel)]="formulario.nombre" placeholder="Primer nombre" />
                 </div>
                 <div class="campo">
-                    <label>Apellido</label>
-                    <input type="text" [(ngModel)]="formulario.apellido" placeholder="Apellido" />
+                    <label>Segundo Nombre (opcional)</label>
+                    <input type="text" [(ngModel)]="formulario.segundo_nombre" placeholder="Segundo nombre" />
+                </div>
+                <div class="campo">
+                    <label>Primer Apellido</label>
+                    <input type="text" [(ngModel)]="formulario.apellido" placeholder="Primer apellido" />
+                </div>
+                <div class="campo">
+                    <label>Segundo Apellido (opcional)</label>
+                    <input type="text" [(ngModel)]="formulario.segundo_apellido" placeholder="Segundo apellido" />
                 </div>
                 <div class="campo">
                     <label>Correo electrónico</label>
@@ -172,8 +188,9 @@
                         <label>Asignatura</label>
                         <select [(ngModel)]="formulario.asignatura_id">
                             <option value="0" disabled>Selecciona una asignatura</option>
-                            <option *ngFor="let asignatura of asignaturas" [value]="asignatura.asignatura_id">{{
-                                asignatura.asignatura_nombre }}</option>
+                            <option *ngFor="let asignatura of asignaturas" [value]="asignatura.asignatura_id">
+                                {{ asignatura.asignatura_nombre }}
+                            </option>
                         </select>
                     </div>
                 </ng-container>
@@ -189,3 +206,6 @@
                 </div>
             </div>
         </div>
+
+    </main>
+</div>
