@@ -1,0 +1,131 @@
+<!-- Layout principal -->
+<div class="layout">
+
+    <!-- Navbar compartido -->
+    <app-navbar [links]="links" [rutaBase]="rutaBase" [mostrarAsignatura]="true"></app-navbar>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+
+        <!-- Encabezado -->
+        <h1 class="titulo">Gestión de Anotaciones</h1>
+        <p class="subtitulo">Consulta y registra anotaciones de tus estudiantes</p>
+
+        <!-- Formulario de registro -->
+        <div class="formulario-card">
+            <h3 class="card-titulo">Registrar Nueva Anotación</h3>
+            <div class="formulario-grid">
+                <div class="campo">
+                    <label>Estudiante</label>
+                    <select [(ngModel)]="formulario.estudiante_id">
+                        <option value="0" disabled>Seleccionar estudiante</option>
+                        <option *ngFor="let est of estudiantes" [value]="est.estudiante_id">
+                            {{ est.usuario_apellido }} {{ est.usuario_nombre }}
+                        </option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label>Tipo de Anotación</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" [(ngModel)]="formulario.tipo" name="tipo" value="positiva" />
+                            Positiva
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" [(ngModel)]="formulario.tipo" name="tipo" value="negativa" />
+                            Negativa
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="campo">
+                <label>Descripción</label>
+                <textarea [(ngModel)]="formulario.descripcion"
+                    placeholder="Describe la situación o comportamiento del estudiante..." rows="4">
+        </textarea>
+            </div>
+
+            <p class="exito" *ngIf="mensajeExito">{{ mensajeExito }}</p>
+            <p class="error" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+            <button class="btn-guardar" (click)="registrarAnotacion()" [disabled]="cargando">
+                {{ cargando ? 'Guardando...' : 'Guardar Anotación' }}
+            </button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filtros">
+            <span class="filtros-label">Filtrar por tipo:</span>
+            <button class="btn-filtro" [ngClass]="{'activo': filtroActivo === 'todas'}"
+                (click)="cambiarFiltro('todas')">Todas</button>
+            <button class="btn-filtro positivo" [ngClass]="{'activo': filtroActivo === 'positiva'}"
+                (click)="cambiarFiltro('positiva')">Positivas</button>
+            <button class="btn-filtro negativo" [ngClass]="{'activo': filtroActivo === 'negativa'}"
+                (click)="cambiarFiltro('negativa')">Negativas</button>
+        </div>
+
+        <!-- Lista de anotaciones -->
+        <div class="lista-card">
+            <h3 class="card-titulo">Anotaciones Registradas ({{ anotaciones.length }})</h3>
+
+            <!-- Sin anotaciones -->
+            <div class="sin-datos" *ngIf="anotaciones.length === 0">
+                No hay anotaciones registradas.
+            </div>
+
+            <!-- Item de anotación -->
+            <div class="anotacion-item" *ngFor="let a of anotaciones">
+                <div class="anotacion-icono" [ngClass]="a.anotacion_tipo">
+                    <!-- Icono pulgar arriba para positiva -->
+                    <svg *ngIf="a.anotacion_tipo === 'positiva'" xmlns="http://www.w3.org/2000/svg" width="18"
+                        height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z" />
+                        <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+                    </svg>
+                    <!-- Icono pulgar abajo para negativa -->
+                    <svg *ngIf="a.anotacion_tipo === 'negativa'" xmlns="http://www.w3.org/2000/svg" width="18"
+                        height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z" />
+                        <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
+                    </svg>
+                </div>
+
+                <div class="anotacion-contenido">
+                    <div class="anotacion-header">
+                        <span class="anotacion-nombre">{{ a.usuario_nombre }} {{ a.usuario_apellido }}</span>
+                        <span class="anotacion-curso">{{ a.curso_nombre }}</span>
+                    </div>
+                    <span class="badge-tipo" [ngClass]="a.anotacion_tipo">
+                        {{ a.anotacion_tipo === 'positiva' ? 'Positiva' : 'Negativa' }}
+                    </span>
+                    <p class="anotacion-descripcion">{{ a.anotacion_descripcion }}</p>
+                    <div class="anotacion-meta">
+                        <span class="meta-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                            {{ formatearFecha(a.anotacion_fecha) }}
+                        </span>
+                        <span class="meta-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            Prof. {{ a.profesor_nombre }} {{ a.profesor_apellido }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>

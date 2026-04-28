@@ -1,9 +1,9 @@
 // Importamos las dependencias necesarias
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { NavbarComponent } from '../../administrador/navbar/navbar.component';
+import { NavbarComponent, NavLink } from '../navbar/navbar.component';
 
 @Component({
   selector: 'app-cambiar-contrasena',
@@ -14,6 +14,12 @@ import { NavbarComponent } from '../../administrador/navbar/navbar.component';
 })
 export class CambiarContrasenaComponent {
 
+  // Links y ruta base recibidos desde el componente padre según el rol
+  @Input() links: NavLink[] = [];
+  @Input() rutaBase: string = '';
+  @Input() mostrarAsignatura: boolean = false;
+
+  // Variables del formulario
   contrasenaActual: string = '';
   contrasenaNueva: string = '';
   confirmarContrasena: string = '';
@@ -30,15 +36,18 @@ export class CambiarContrasenaComponent {
 
   constructor(private http: HttpClient) { }
 
+  // Cambia la contraseña del usuario autenticado
   cambiarContrasena() {
     this.mensajeExito = '';
     this.mensajeError = '';
 
+    // Validamos que las contraseñas nuevas coincidan
     if (this.contrasenaNueva !== this.confirmarContrasena) {
       this.mensajeError = 'Las contraseñas nuevas no coinciden.';
       return;
     }
 
+    // Validamos longitud mínima
     if (this.contrasenaNueva.length < 6) {
       this.mensajeError = 'La contraseña nueva debe tener al menos 6 caracteres.';
       return;

@@ -10,6 +10,7 @@
     position: fixed;
     top: 0;
     left: 0;
+    z-index: 100;
 }
 
 /* Logo */
@@ -82,7 +83,9 @@
 }
 
 .navbar-links li a {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     padding: 12px 24px;
     font-size: 14px;
     color: #555;
@@ -119,6 +122,10 @@
     color: #555;
     cursor: pointer;
     transition: background-color 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .btn-cerrar-sesion:hover {
@@ -127,17 +134,18 @@
     border-color: #d93025;
 }
 
-/* Alineación icono + texto en los links */
-.navbar-links li a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar {
+        width: 100%;
+        min-height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 16px 0;
+    }
 
-/* Alineación icono + texto en cerrar sesión */
-.btn-cerrar-sesion {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    .navbar-links li a {
+        padding: 10px 16px;
+    }
 }

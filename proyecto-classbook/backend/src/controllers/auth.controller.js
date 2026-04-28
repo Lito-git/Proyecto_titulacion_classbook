@@ -10,11 +10,13 @@ const login = async (req, res) => {
     const { email, contrasena } = req.body;
 
     try {
-        // Buscamos el usuario por email junto con el nombre de su rol
+        // Buscamos el usuario por email junto con el nombre de su rol y asignatura si es docente
         const [usuarios] = await db.query(
-            `SELECT u.*, r.rol_nombre
+            `SELECT u.*, r.rol_nombre, a.asignatura_nombre
              FROM usuarios u
              JOIN roles r ON u.usuario_rol_id = r.rol_id
+             LEFT JOIN docente_asignatura da ON da.docente_usuario_id = u.usuario_id
+             LEFT JOIN asignaturas a ON a.asignatura_id = da.asignatura_id
              WHERE u.usuario_email = ?`,
             [email]
         );
@@ -54,7 +56,8 @@ const login = async (req, res) => {
             token,
             rol: usuario.rol_nombre,
             nombre: usuario.usuario_nombre,
-            apellido: usuario.usuario_apellido
+            apellido: usuario.usuario_apellido,
+            asignatura: usuario.asignatura_nombre || ''
         });
 
     } catch (error) {

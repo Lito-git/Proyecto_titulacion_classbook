@@ -204,3 +204,14 @@
     margin-bottom: 8px;
     padding-left: 4px;
 }
+
+@media (max-width: 768px) {
+    .contenido {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .filtros-grid {
+        grid-template-columns: 1fr;
+    }
+}

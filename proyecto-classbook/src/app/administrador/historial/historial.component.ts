@@ -3,7 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { NavbarComponent } from '../navbar/navbar.component';
+import { NavbarComponent } from '../../shared/navbar/navbar.component';
+import { LINKS_ADMINISTRADOR } from '../../shared/navbar.links';
 
 @Component({
   selector: 'app-historial',
@@ -14,11 +15,16 @@ import { NavbarComponent } from '../navbar/navbar.component';
 })
 export class HistorialComponent implements OnInit {
 
+  // Links y ruta base para el navbar compartido
+  links = LINKS_ADMINISTRADOR;
+  rutaBase = '/administrador';
+
+  // Datos del historial
   historial: any[] = [];
   historialFiltrado: any[] = [];
   usuarios: any[] = [];
 
-  // Filtros
+  // Variables de filtros
   filtroTipo: string = '';
   filtroUsuario: string = '';
   filtroFechaInicio: string = '';
@@ -33,6 +39,7 @@ export class HistorialComponent implements OnInit {
     this.cargarUsuarios();
   }
 
+  // Obtiene el token para los headers de las peticiones
   private getHeaders() {
     const token = sessionStorage.getItem('token');
     return new HttpHeaders({ Authorization: `Bearer ${token}` });
@@ -41,10 +48,7 @@ export class HistorialComponent implements OnInit {
   // Carga el historial completo desde el backend
   cargarHistorial() {
     this.http.get<any[]>(`${this.apiUrl}/historial`, { headers: this.getHeaders() }).subscribe({
-      next: (data) => {
-        this.historial = data;
-        this.historialFiltrado = data;
-      },
+      next: (data) => { this.historial = data; this.historialFiltrado = data; },
       error: (err) => console.error('Error al cargar historial', err)
     });
   }
@@ -56,7 +60,7 @@ export class HistorialComponent implements OnInit {
     });
   }
 
-  // Aplica los filtros al historial
+  // Aplica los filtros seleccionados enviando query params al backend
   aplicarFiltros() {
     const params: any = {};
     if (this.filtroTipo) params.tipo = this.filtroTipo;
@@ -64,7 +68,6 @@ export class HistorialComponent implements OnInit {
     if (this.filtroFechaInicio) params.fecha_inicio = this.filtroFechaInicio;
     if (this.filtroFechaFin) params.fecha_fin = this.filtroFechaFin;
 
-    // Construimos los query params para el backend
     const queryString = new URLSearchParams(params).toString();
     const url = `${this.apiUrl}/historial${queryString ? '?' + queryString : ''}`;
 
@@ -74,22 +77,13 @@ export class HistorialComponent implements OnInit {
     });
   }
 
-  // Limpia todos los filtros
+  // Limpia todos los filtros y restaura el historial completo
   limpiarFiltros() {
     this.filtroTipo = '';
     this.filtroUsuario = '';
     this.filtroFechaInicio = '';
     this.filtroFechaFin = '';
     this.historialFiltrado = this.historial;
-  }
-
-  // Separa el título del detalle usando el separador |
-  getTitulo(detalle: string): string {
-    return detalle.includes('|') ? detalle.split('|')[0] : detalle;
-  }
-
-  getDetalle(detalle: string): string {
-    return detalle.includes('|') ? detalle.split('|')[1] : '';
   }
 
   // Formatea la fecha al formato dd-mm-yyyy hh:mm:ss a.m/p.m
@@ -104,5 +98,15 @@ export class HistorialComponent implements OnInit {
     const ampm = horas >= 12 ? 'p.m.' : 'a.m.';
     horas = horas % 12 || 12;
     return `${dia}-${mes}-${anio}, ${horas}:${minutos}:${segundos} ${ampm}`;
+  }
+
+  // Separa el título del detalle usando el separador |
+  getTitulo(detalle: string): string {
+    return detalle?.includes('|') ? detalle.split('|')[0] : detalle;
+  }
+
+  // Separa el detalle del título usando el separador |
+  getDetalle(detalle: string): string {
+    return detalle?.includes('|') ? detalle.split('|')[1] : '';
   }
 }

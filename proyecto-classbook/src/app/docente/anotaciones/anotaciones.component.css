@@ -1,0 +1,307 @@
+/* Layout principal */
+.layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+/* Contenido principal */
+.contenido {
+    margin-left: 230px;
+    padding: 40px;
+    flex: 1;
+}
+
+/* Títulos */
+.titulo {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #0d2d5e;
+    margin-bottom: 4px;
+}
+
+.subtitulo {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 24px;
+}
+
+/* Card formulario */
+.formulario-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    margin-bottom: 24px;
+}
+
+.card-titulo {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0d2d5e;
+    margin-bottom: 20px;
+}
+
+/* Grid del formulario */
+.formulario-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+/* Campos */
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.campo label {
+    font-size: 13px;
+    color: #555;
+}
+
+.campo select,
+.campo textarea {
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    background-color: #ffffff;
+    transition: border-color 0.2s;
+    resize: vertical;
+}
+
+.campo select:focus,
+.campo textarea:focus {
+    border-color: #16a34a;
+}
+
+/* Radio buttons */
+.radio-group {
+    display: flex;
+    gap: 24px;
+    padding-top: 8px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+}
+
+/* Botón guardar */
+.btn-guardar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background-color: #16a34a;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-guardar:hover {
+    background-color: #15803d;
+}
+
+.btn-guardar:disabled {
+    background-color: #86efac;
+    cursor: not-allowed;
+}
+
+/* Filtros */
+.filtros {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.filtros-label {
+    font-size: 14px;
+    color: #555;
+}
+
+.btn-filtro {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid #e0e0e0;
+    background-color: #ffffff;
+    font-size: 13px;
+    cursor: pointer;
+    color: #555;
+    transition: all 0.2s;
+}
+
+.btn-filtro.activo {
+    background-color: #0d2d5e;
+    color: white;
+    border-color: #0d2d5e;
+}
+
+.btn-filtro.positivo.activo {
+    background-color: #16a34a;
+    border-color: #16a34a;
+    color: white;
+}
+
+.btn-filtro.negativo.activo {
+    background-color: #d93025;
+    border-color: #d93025;
+    color: white;
+}
+
+/* Lista de anotaciones */
+.lista-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Item de anotación */
+.anotacion-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.anotacion-item:last-child {
+    border-bottom: none;
+}
+
+/* Icono de anotación */
+.anotacion-icono {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.anotacion-icono.positiva {
+    background-color: #d1fae5;
+    color: #16a34a;
+}
+
+.anotacion-icono.negativa {
+    background-color: #fee2e2;
+    color: #d93025;
+}
+
+/* Contenido de la anotación */
+.anotacion-contenido {
+    flex: 1;
+}
+
+.anotacion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.anotacion-nombre {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0d2d5e;
+}
+
+.anotacion-curso {
+    font-size: 12px;
+    color: #999;
+}
+
+/* Badge tipo */
+.badge-tipo {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.badge-tipo.positiva {
+    background-color: #d1fae5;
+    color: #16a34a;
+}
+
+.badge-tipo.negativa {
+    background-color: #fee2e2;
+    color: #d93025;
+}
+
+/* Descripción */
+.anotacion-descripcion {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* Metadatos */
+.anotacion-meta {
+    display: flex;
+    gap: 16px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #999;
+}
+
+/* Sin datos */
+.sin-datos {
+    text-align: center;
+    padding: 32px 0;
+    font-size: 14px;
+    color: #999;
+}
+
+/* Mensajes */
+.exito {
+    color: #1e8e3e;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.error {
+    color: #d93025;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .contenido {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .formulario-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filtros {
+        flex-wrap: wrap;
+    }
+}

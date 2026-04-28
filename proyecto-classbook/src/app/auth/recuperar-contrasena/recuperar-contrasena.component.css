@@ -117,3 +117,13 @@ button:disabled {
 .volver:hover {
     text-decoration: underline;
 }
+
+@media (max-width: 768px) {
+    .login-container {
+        padding: 20px;
+    }
+
+    .login-card {
+        padding: 24px;
+    }
+}

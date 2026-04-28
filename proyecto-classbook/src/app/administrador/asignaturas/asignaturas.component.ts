@@ -3,7 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { NavbarComponent } from '../navbar/navbar.component';
+import { NavbarComponent } from '../../shared/navbar/navbar.component';
+import { LINKS_ADMINISTRADOR } from '../../shared/navbar.links';
 
 @Component({
   selector: 'app-asignaturas',
@@ -14,36 +15,29 @@ import { NavbarComponent } from '../navbar/navbar.component';
 })
 export class AsignaturasComponent implements OnInit {
 
+  links = LINKS_ADMINISTRADOR;
+  rutaBase = '/administrador';
+
   asignaturas: any[] = [];
   cargando: boolean = false;
   mensajeExito: string = '';
   mensajeError: string = '';
-
-  // Control del modal
   mostrarModal: boolean = false;
   modoEdicion: boolean = false;
 
-  // Datos del formulario
-  formulario = {
-    id: 0,
-    nombre: '',
-    descripcion: ''
-  };
+  formulario = { id: 0, nombre: '', descripcion: '' };
 
   private apiUrl = 'http://localhost:3000';
 
   constructor(private http: HttpClient) { }
 
-  ngOnInit() {
-    this.cargarAsignaturas();
-  }
+  ngOnInit() { this.cargarAsignaturas(); }
 
   private getHeaders() {
     const token = sessionStorage.getItem('token');
     return new HttpHeaders({ Authorization: `Bearer ${token}` });
   }
 
-  // Carga todas las asignaturas desde el backend
   cargarAsignaturas() {
     this.http.get<any[]>(`${this.apiUrl}/asignaturas`, { headers: this.getHeaders() }).subscribe({
       next: (data) => this.asignaturas = data,
@@ -51,7 +45,6 @@ export class AsignaturasComponent implements OnInit {
     });
   }
 
-  // Abre el modal para crear una nueva asignatura
   abrirModalCrear() {
     this.modoEdicion = false;
     this.formulario = { id: 0, nombre: '', descripcion: '' };
@@ -60,7 +53,6 @@ export class AsignaturasComponent implements OnInit {
     this.mostrarModal = true;
   }
 
-  // Abre el modal para editar una asignatura existente
   abrirModalEditar(asignatura: any) {
     this.modoEdicion = true;
     this.formulario = {
@@ -73,14 +65,12 @@ export class AsignaturasComponent implements OnInit {
     this.mostrarModal = true;
   }
 
-  // Cierra el modal
   cerrarModal() {
     this.mostrarModal = false;
     this.mensajeExito = '';
     this.mensajeError = '';
   }
 
-  // Guarda la asignatura (crear o editar)
   guardarAsignatura() {
     this.mensajeExito = '';
     this.mensajeError = '';
@@ -91,35 +81,20 @@ export class AsignaturasComponent implements OnInit {
         { nombre: this.formulario.nombre, descripcion: this.formulario.descripcion },
         { headers: this.getHeaders() }
       ).subscribe({
-        next: (res: any) => {
-          this.mensajeExito = res.mensaje;
-          this.cargarAsignaturas();
-          this.cargando = false;
-        },
-        error: (err) => {
-          this.mensajeError = err.error?.mensaje || 'Error al editar asignatura.';
-          this.cargando = false;
-        }
+        next: (res: any) => { this.mensajeExito = res.mensaje; this.cargarAsignaturas(); this.cargando = false; },
+        error: (err) => { this.mensajeError = err.error?.mensaje || 'Error al editar asignatura.'; this.cargando = false; }
       });
     } else {
       this.http.post(`${this.apiUrl}/asignaturas`,
         { nombre: this.formulario.nombre, descripcion: this.formulario.descripcion },
         { headers: this.getHeaders() }
       ).subscribe({
-        next: (res: any) => {
-          this.mensajeExito = res.mensaje;
-          this.cargarAsignaturas();
-          this.cargando = false;
-        },
-        error: (err) => {
-          this.mensajeError = err.error?.mensaje || 'Error al crear asignatura.';
-          this.cargando = false;
-        }
+        next: (res: any) => { this.mensajeExito = res.mensaje; this.cargarAsignaturas(); this.cargando = false; },
+        error: (err) => { this.mensajeError = err.error?.mensaje || 'Error al crear asignatura.'; this.cargando = false; }
       });
     }
   }
 
-  // Elimina una asignatura
   eliminarAsignatura(id: number) {
     if (!confirm('¿Estás seguro de eliminar esta asignatura?')) return;
     this.http.delete(`${this.apiUrl}/asignaturas/${id}`, { headers: this.getHeaders() }).subscribe({

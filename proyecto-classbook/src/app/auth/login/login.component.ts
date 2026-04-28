@@ -28,7 +28,7 @@ export class LoginComponent {
 
     this.authService.login(this.email, this.contrasena).subscribe({
       next: (respuesta: any) => {
-        this.authService.guardarSesion(respuesta.token, respuesta.rol, respuesta.nombre, respuesta.apellido);
+        this.authService.guardarSesion(respuesta.token, respuesta.rol, respuesta.nombre, respuesta.apellido, respuesta.asignatura);
         this.router.navigate([`/${respuesta.rol}`]);
         this.cargando = false;
       },

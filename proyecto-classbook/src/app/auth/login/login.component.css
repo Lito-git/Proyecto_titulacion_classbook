@@ -21,7 +21,6 @@
     max-width: 400px;
 }
 
-/* Título principal */
 /* Título ClassBook */
 .login-titulo {
     font-family: 'Nunito Sans', sans-serif;
@@ -126,4 +125,14 @@ button:disabled {
 .login-logo {
     width: 100px;
     margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        padding: 20px;
+    }
+
+    .login-card {
+        padding: 24px;
+    }
 }

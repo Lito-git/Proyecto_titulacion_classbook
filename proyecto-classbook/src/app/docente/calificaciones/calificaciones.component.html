@@ -1,0 +1,209 @@
+<!-- Layout principal -->
+<div class="layout">
+
+    <!-- Navbar compartido -->
+    <app-navbar [links]="links" [rutaBase]="rutaBase" [mostrarAsignatura]="true"></app-navbar>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+
+        <!-- Encabezado -->
+        <h1 class="titulo">Gestión de Calificaciones</h1>
+        <p class="subtitulo">Consulta, registra y modifica calificaciones de tus estudiantes</p>
+
+        <!-- Formulario de registro siempre visible cuando hay datos -->
+        <div class="formulario-card" *ngIf="mostrarTabla">
+            <h3 class="card-titulo">Registrar Nueva Calificación</h3>
+            <div class="formulario-grid">
+                <div class="campo">
+                    <label>Estudiante</label>
+                    <select [(ngModel)]="formulario.estudiante_id">
+                        <option value="0" disabled>Seleccionar estudiante</option>
+                        <option *ngFor="let est of estudiantes" [value]="est.estudiante_id">
+                            {{ est.usuario_apellido }} {{ est.usuario_nombre }}
+                        </option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label>Tipo de Evaluación</label>
+                    <select [(ngModel)]="tipoSeleccionado" (change)="onTipoChange()">
+                        <option [ngValue]="null" disabled>Seleccionar tipo</option>
+                        <option *ngFor="let tipo of tiposEvaluacion" [ngValue]="tipo">{{ tipo.label }}</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label>Calificación (2.0 - 7.0)</label>
+                    <input type="number" [(ngModel)]="formulario.nota" min="2.0" max="7.0" step="0.1"
+                        placeholder="6.5" />
+                </div>
+            </div>
+
+            <p class="exito" *ngIf="mensajeExito">{{ mensajeExito }}</p>
+            <p class="error" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+            <button class="btn-guardar" (click)="registrarCalificacion()" [disabled]="cargando">
+                {{ cargando ? 'Guardando...' : 'Guardar Calificación' }}
+            </button>
+        </div>
+
+        <!-- Tabla de calificaciones -->
+        <div class="tabla-card" *ngIf="mostrarTabla">
+            <h3 class="card-titulo">
+                Calificaciones - {{ asignaciones[0]?.curso_nombre }} - {{ asignaciones[0]?.asignatura_nombre }}
+            </h3>
+
+            <p class="exito" *ngIf="mensajeExito">{{ mensajeExito }}</p>
+            <p class="error" *ngIf="mensajeError">{{ mensajeError }}</p>
+
+            <div class="tabla-container">
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>ESTUDIANTE</th>
+                            <th>PRUEBA 1</th>
+                            <th>PRUEBA 2</th>
+                            <th>PRUEBA 3</th>
+                            <th>ACTIVIDAD</th>
+                            <th>EXAMEN</th>
+                            <th>PROMEDIO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let est of calificaciones">
+                            <td>{{ est.usuario_nombre }} {{ est.usuario_apellido }}</td>
+
+                            <!-- Prueba 1 -->
+                            <td>
+                                <ng-container *ngIf="getNota(est.calificaciones, 'prueba', 1) as cal; else sinNota1">
+                                    <ng-container
+                                        *ngIf="calificacionEditando?.calificacion_id === cal.calificacion_id; else verNota1">
+                                        <input class="input-nota" type="number" [(ngModel)]="notaEditando" min="2"
+                                            max="7" step="0.1" />
+                                        <button class="btn-ok" (click)="guardarEdicion(cal.calificacion_id)">✓</button>
+                                        <button class="btn-cancel" (click)="cancelarEdicion()">✗</button>
+                                    </ng-container>
+                                    <ng-template #verNota1>
+                                        {{ cal.calificacion_nota }}
+                                        <button class="btn-editar-nota" (click)="iniciarEdicion(cal)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                            </svg>
+                                        </button>
+                                    </ng-template>
+                                </ng-container>
+                                <ng-template #sinNota1>-</ng-template>
+                            </td>
+
+                            <!-- Prueba 2 -->
+                            <td>
+                                <ng-container *ngIf="getNota(est.calificaciones, 'prueba', 2) as cal; else sinNota2">
+                                    <ng-container
+                                        *ngIf="calificacionEditando?.calificacion_id === cal.calificacion_id; else verNota2">
+                                        <input class="input-nota" type="number" [(ngModel)]="notaEditando" min="2"
+                                            max="7" step="0.1" />
+                                        <button class="btn-ok" (click)="guardarEdicion(cal.calificacion_id)">✓</button>
+                                        <button class="btn-cancel" (click)="cancelarEdicion()">✗</button>
+                                    </ng-container>
+                                    <ng-template #verNota2>
+                                        {{ cal.calificacion_nota }}
+                                        <button class="btn-editar-nota" (click)="iniciarEdicion(cal)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                            </svg>
+                                        </button>
+                                    </ng-template>
+                                </ng-container>
+                                <ng-template #sinNota2>-</ng-template>
+                            </td>
+
+                            <!-- Prueba 3 -->
+                            <td>
+                                <ng-container *ngIf="getNota(est.calificaciones, 'prueba', 3) as cal; else sinNota3">
+                                    <ng-container
+                                        *ngIf="calificacionEditando?.calificacion_id === cal.calificacion_id; else verNota3">
+                                        <input class="input-nota" type="number" [(ngModel)]="notaEditando" min="2"
+                                            max="7" step="0.1" />
+                                        <button class="btn-ok" (click)="guardarEdicion(cal.calificacion_id)">✓</button>
+                                        <button class="btn-cancel" (click)="cancelarEdicion()">✗</button>
+                                    </ng-container>
+                                    <ng-template #verNota3>
+                                        {{ cal.calificacion_nota }}
+                                        <button class="btn-editar-nota" (click)="iniciarEdicion(cal)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                            </svg>
+                                        </button>
+                                    </ng-template>
+                                </ng-container>
+                                <ng-template #sinNota3>-</ng-template>
+                            </td>
+
+                            <!-- Actividad -->
+                            <td>
+                                <ng-container *ngIf="getNota(est.calificaciones, 'actividad', 1) as cal; else sinNota4">
+                                    <ng-container
+                                        *ngIf="calificacionEditando?.calificacion_id === cal.calificacion_id; else verNota4">
+                                        <input class="input-nota" type="number" [(ngModel)]="notaEditando" min="2"
+                                            max="7" step="0.1" />
+                                        <button class="btn-ok" (click)="guardarEdicion(cal.calificacion_id)">✓</button>
+                                        <button class="btn-cancel" (click)="cancelarEdicion()">✗</button>
+                                    </ng-container>
+                                    <ng-template #verNota4>
+                                        {{ cal.calificacion_nota }}
+                                        <button class="btn-editar-nota" (click)="iniciarEdicion(cal)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                            </svg>
+                                        </button>
+                                    </ng-template>
+                                </ng-container>
+                                <ng-template #sinNota4>-</ng-template>
+                            </td>
+
+                            <!-- Examen -->
+                            <td>
+                                <ng-container *ngIf="getNota(est.calificaciones, 'examen', 1) as cal; else sinNota5">
+                                    <ng-container
+                                        *ngIf="calificacionEditando?.calificacion_id === cal.calificacion_id; else verNota5">
+                                        <input class="input-nota" type="number" [(ngModel)]="notaEditando" min="2"
+                                            max="7" step="0.1" />
+                                        <button class="btn-ok" (click)="guardarEdicion(cal.calificacion_id)">✓</button>
+                                        <button class="btn-cancel" (click)="cancelarEdicion()">✗</button>
+                                    </ng-container>
+                                    <ng-template #verNota5>
+                                        {{ cal.calificacion_nota }}
+                                        <button class="btn-editar-nota" (click)="iniciarEdicion(cal)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                            </svg>
+                                        </button>
+                                    </ng-template>
+                                </ng-container>
+                                <ng-template #sinNota5>-</ng-template>
+                            </td>
+
+                            <!-- Promedio -->
+                            <td class="promedio">{{ getPromedio(est.calificaciones) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>

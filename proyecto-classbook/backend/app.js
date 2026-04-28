@@ -13,6 +13,8 @@ const cursosRoutes = require('./src/routes/cursos.routes');
 const asignaturasRoutes = require('./src/routes/asignaturas.routes');
 const historialRoutes = require('./src/routes/historial.routes');
 
+const docenteRoutes = require('./src/routes/docente.routes');
+
 // Inicializamos la aplicación Express
 const app = express();
 
@@ -26,6 +28,8 @@ app.use('/usuarios', usuariosRoutes);
 app.use('/cursos', cursosRoutes);
 app.use('/asignaturas', asignaturasRoutes);
 app.use('/historial', historialRoutes);
+
+app.use('/docente', docenteRoutes);
 
 // Ruta de prueba para verificar que el servidor está funcionando
 app.get('/', (req, res) => {

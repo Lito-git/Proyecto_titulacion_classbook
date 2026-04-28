@@ -279,3 +279,20 @@
 .campo select:focus {
     border-color: #7c3aed;
 }
+
+@media (max-width: 768px) {
+    .contenido {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .encabezado {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .grid-cursos {
+        grid-template-columns: 1fr;
+    }
+}
