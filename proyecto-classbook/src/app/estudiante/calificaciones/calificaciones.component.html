@@ -1,0 +1,100 @@
+<!-- Layout principal -->
+<div class="layout">
+
+    <!-- Navbar compartido -->
+    <app-navbar [links]="links" [rutaBase]="rutaBase"></app-navbar>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+
+        <!-- Encabezado -->
+        <div class="encabezado">
+            <div>
+                <h1 class="titulo">Mis Calificaciones</h1>
+                <p class="subtitulo">Revisa tu rendimiento académico por asignatura</p>
+            </div>
+            <div class="encabezado-botones">
+                <button class="btn-grafico" (click)="toggleGrafico()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10" />
+                        <line x1="12" y1="20" x2="12" y2="4" />
+                        <line x1="6" y1="20" x2="6" y2="14" />
+                    </svg>
+                    {{ mostrarGrafico ? 'Ocultar gráfico' : 'Mostrar gráfico' }}
+                </button>
+                <button class="btn-pdf" (click)="descargarPDF()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    Descargar certificado PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Tarjeta promedio general -->
+        <div class="tarjeta-promedio">
+            <p class="promedio-label">Promedio General</p>
+            <h2 class="promedio-numero">{{ promedioGeneral || '-' }}</h2>
+        </div>
+
+        <!-- Gráfico -->
+        <div class="grafico-card" *ngIf="mostrarGrafico">
+            <h3 class="card-titulo">Rendimiento por Asignatura</h3>
+            <canvas #graficoCanvas></canvas>
+        </div>
+
+        <!-- Tabla de calificaciones -->
+        <div class="tabla-card" *ngIf="asignaturas.length > 0">
+            <div class="tabla-container">
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>ASIGNATURA</th>
+                            <th>PRUEBA 1</th>
+                            <th>PRUEBA 2</th>
+                            <th>PRUEBA 3</th>
+                            <th>ACTIVIDAD</th>
+                            <th>EXAMEN</th>
+                            <th>PROMEDIO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let asig of asignaturas">
+                            <td class="asignatura-nombre">{{ asig.asignatura_nombre }}</td>
+                            <td [ngClass]="getClaseNota(getNota(asig.calificaciones, 'prueba', 1))">
+                                {{ getNota(asig.calificaciones, 'prueba', 1) }}
+                            </td>
+                            <td [ngClass]="getClaseNota(getNota(asig.calificaciones, 'prueba', 2))">
+                                {{ getNota(asig.calificaciones, 'prueba', 2) }}
+                            </td>
+                            <td [ngClass]="getClaseNota(getNota(asig.calificaciones, 'prueba', 3))">
+                                {{ getNota(asig.calificaciones, 'prueba', 3) }}
+                            </td>
+                            <td [ngClass]="getClaseNota(getNota(asig.calificaciones, 'actividad', 1))">
+                                {{ getNota(asig.calificaciones, 'actividad', 1) }}
+                            </td>
+                            <td [ngClass]="getClaseNota(getNota(asig.calificaciones, 'examen', 1))">
+                                {{ getNota(asig.calificaciones, 'examen', 1) }}
+                            </td>
+                            <td>
+                                <span class="badge-nota" [ngClass]="getClaseNota(asig.promedio)">
+                                    {{ asig.promedio || '-' }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sin calificaciones -->
+        <div class="sin-datos" *ngIf="asignaturas.length === 0">
+            No tienes calificaciones registradas aún.
+        </div>
+
+    </main>
+</div>

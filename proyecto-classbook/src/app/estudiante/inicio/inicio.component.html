@@ -1,0 +1,82 @@
+<!-- Layout principal del panel estudiante -->
+<div class="layout">
+
+    <!-- Navbar compartido -->
+    <app-navbar [links]="links" [rutaBase]="rutaBase"></app-navbar>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+
+        <!-- Saludo -->
+        <h1 class="titulo">Bienvenido/a, {{ nombre }}</h1>
+        <p class="subtitulo">Aquí está tu resumen académico</p>
+
+        <!-- Tarjetas de resumen -->
+        <div class="tarjetas">
+            <div class="tarjeta">
+                <span class="tarjeta-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                        stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="8" r="6" />
+                        <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+                    </svg>
+                </span>
+                <h2 class="tarjeta-numero">{{ promedioGeneral || '-' }}</h2>
+                <p class="tarjeta-label">Promedio General</p>
+            </div>
+
+            <div class="tarjeta">
+                <span class="tarjeta-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                        stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                        <polyline points="16 7 22 7 22 13" />
+                    </svg>
+                </span>
+                <h2 class="tarjeta-numero">{{ totalAnotacionesPositivas }}</h2>
+                <p class="tarjeta-label">Anotaciones Positivas</p>
+            </div>
+
+            <div class="tarjeta">
+                <span class="tarjeta-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                        stroke="#1a73e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                </span>
+                <h2 class="tarjeta-numero">{{ totalEvaluacionesMes }}</h2>
+                <p class="tarjeta-label">Evaluaciones este mes</p>
+            </div>
+        </div>
+
+        <!-- Actividad reciente -->
+        <div class="card">
+            <h3 class="card-titulo">Actividad Reciente</h3>
+
+            <div class="sin-datos" *ngIf="actividadReciente.length === 0">
+                No hay actividad reciente registrada.
+            </div>
+
+            <div class="actividad-item" *ngFor="let item of actividadReciente">
+                <div class="actividad-info">
+                    <!-- Calificación -->
+                    <ng-container *ngIf="item.tipo === 'calificacion'">
+                        <span class="actividad-titulo">Nueva calificación registrada</span>
+                        <span class="actividad-detalle">{{ item.asignatura_nombre }} - {{ item.calificacion_tipo |
+                            titlecase }} {{ item.calificacion_numero }}: {{ item.calificacion_nota }}</span>
+                    </ng-container>
+                    <!-- Anotación positiva -->
+                    <ng-container *ngIf="item.tipo === 'anotacion'">
+                        <span class="actividad-titulo">Anotación positiva recibida</span>
+                        <span class="actividad-detalle">{{ item.anotacion_descripcion }}</span>
+                    </ng-container>
+                </div>
+                <span class="actividad-tiempo">{{ tiempoRelativo(item.fecha) }}</span>
+            </div>
+        </div>
+
+    </main>
+</div>

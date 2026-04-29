@@ -21,12 +21,15 @@ export class AuthService {
 
   // sessionStorage se limpia automáticamente al cerrar el navegador
   // Guarda el token, rol, nombre y apellido en sessionStorage al iniciar sesión
-  guardarSesion(token: string, rol: string, nombre: string, apellido: string, asignatura: string = '') {
+  guardarSesion(token: string, rol: string, nombre: string, apellido: string, asignatura: string = '', curso: string = '', segundoNombre: string = '', segundoApellido: string = '') {
     sessionStorage.setItem('token', token);
     sessionStorage.setItem('rol', rol);
     sessionStorage.setItem('nombre', nombre);
+    sessionStorage.setItem('segundo_nombre', segundoNombre);
     sessionStorage.setItem('apellido', apellido);
+    sessionStorage.setItem('segundo_apellido', segundoApellido);
     sessionStorage.setItem('asignatura', asignatura);
+    sessionStorage.setItem('curso', curso);
   }
 
   // Cierra la sesión eliminando los datos del sessionStorage

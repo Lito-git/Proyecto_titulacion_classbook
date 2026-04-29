@@ -29,6 +29,7 @@ export class NavbarComponent implements OnInit {
   apellido: string = sessionStorage.getItem('apellido') || '';
   rol: string = sessionStorage.getItem('rol') || '';
   asignatura: string = sessionStorage.getItem('asignatura') || '';
+  curso: string = sessionStorage.getItem('curso') || '';
 
   constructor(private router: Router) { }
 
@@ -40,7 +41,7 @@ export class NavbarComponent implements OnInit {
       'administrador': 'Administrador',
       'docente': `Docente${this.mostrarAsignatura && this.asignatura ? ' - ' + this.asignatura : ''}`,
       'inspector': 'Inspector',
-      'estudiante': 'Estudiante'
+      'estudiante': `Estudiante${this.curso ? ' - ' + this.curso : ''}`
     };
     return roles[this.rol] || this.rol;
   }

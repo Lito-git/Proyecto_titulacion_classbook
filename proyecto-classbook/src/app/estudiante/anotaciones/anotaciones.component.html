@@ -1,0 +1,82 @@
+<!-- Layout principal -->
+<div class="layout">
+
+    <!-- Navbar compartido -->
+    <app-navbar [links]="links" [rutaBase]="rutaBase"></app-navbar>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+
+        <!-- Encabezado -->
+        <h1 class="titulo">Mis Anotaciones Positivas</h1>
+        <p class="subtitulo">Reconocimientos y felicitaciones recibidas</p>
+
+        <!-- Tarjeta resumen semestre -->
+        <div class="tarjeta-semestre">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+            <div>
+                <h2 class="semestre-numero">{{ totalSemestre }}</h2>
+                <p class="semestre-label">Anotaciones positivas este semestre</p>
+            </div>
+        </div>
+
+        <!-- Lista de anotaciones -->
+        <div class="lista-card">
+
+            <!-- Sin anotaciones -->
+            <div class="sin-datos" *ngIf="anotaciones.length === 0">
+                No tienes anotaciones positivas registradas aún.
+            </div>
+
+            <!-- Item de anotación -->
+            <div class="anotacion-item" *ngFor="let a of anotaciones">
+                <div class="anotacion-icono">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                </div>
+                <div class="anotacion-contenido">
+                    <p class="anotacion-descripcion">{{ a.anotacion_descripcion }}</p>
+                    <div class="anotacion-meta">
+                        <span class="meta-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                            {{ formatearFecha(a.anotacion_fecha) }}
+                        </span>
+                        <span class="meta-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            Prof. {{ getNombreProfesor(a) }}
+                        </span>
+                        <span class="meta-item" *ngIf="a.asignatura_nombre">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                            </svg>
+                            {{ a.asignatura_nombre }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>

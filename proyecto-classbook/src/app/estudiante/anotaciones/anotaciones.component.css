@@ -1,0 +1,136 @@
+/* Layout principal */
+.layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+/* Contenido principal */
+.contenido {
+    margin-left: 230px;
+    padding: 40px;
+    flex: 1;
+}
+
+/* Títulos */
+.titulo {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #0d2d5e;
+    margin-bottom: 4px;
+}
+
+.subtitulo {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 24px;
+}
+
+/* Tarjeta resumen semestre */
+.tarjeta-semestre {
+    background-color: #16a34a;
+    border-radius: 8px;
+    padding: 24px 32px;
+    margin-bottom: 24px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.semestre-numero {
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.semestre-label {
+    font-size: 14px;
+    opacity: 0.85;
+}
+
+/* Card lista */
+.lista-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Item de anotación */
+.anotacion-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.anotacion-item:last-child {
+    border-bottom: none;
+}
+
+/* Icono */
+.anotacion-icono {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #d1fae5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Contenido */
+.anotacion-contenido {
+    flex: 1;
+}
+
+.anotacion-descripcion {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* Metadatos */
+.anotacion-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #999;
+}
+
+/* Sin datos */
+.sin-datos {
+    text-align: center;
+    padding: 32px 0;
+    font-size: 14px;
+    color: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .contenido {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .tarjeta-semestre {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .anotacion-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+}

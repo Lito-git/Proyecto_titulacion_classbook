@@ -12,31 +12,34 @@ const login = async (req, res) => {
     try {
         // Buscamos el usuario por email junto con el nombre de su rol y asignatura si es docente
         const [usuarios] = await db.query(
-            `SELECT u.*, r.rol_nombre, a.asignatura_nombre
-             FROM usuarios u
-             JOIN roles r ON u.usuario_rol_id = r.rol_id
-             LEFT JOIN docente_asignatura da ON da.docente_usuario_id = u.usuario_id
-             LEFT JOIN asignaturas a ON a.asignatura_id = da.asignatura_id
-             WHERE u.usuario_email = ?`,
+            `SELECT u.usuario_id, u.usuario_nombre, u.usuario_segundo_nombre, u.usuario_apellido, u.usuario_segundo_apellido, u.usuario_email, u.usuario_contrasena,
+    u.usuario_activo, r.rol_nombre, a.asignatura_nombre, c.curso_nombre
+            FROM usuarios u
+            JOIN roles r ON u.usuario_rol_id = r.rol_id
+            LEFT JOIN docente_asignatura da ON da.docente_usuario_id = u.usuario_id
+            LEFT JOIN asignaturas a ON a.asignatura_id = da.asignatura_id
+            LEFT JOIN estudiantes e ON e.estudiante_usuario_id = u.usuario_id
+            LEFT JOIN cursos c ON c.curso_id = e.estudiante_curso_id
+            WHERE u.usuario_email = ?`,
             [email]
         );
 
         // Si no existe el usuario retornamos error
         if (usuarios.length === 0) {
-            return res.status(401).json({ mensaje: 'Credenciales inválidas.' });
+            return res.status(401).json({ mensaje: 'El usuario o contraseña son incorrectos.' });
         }
 
         const usuario = usuarios[0];
 
         // Verificamos que el usuario esté activo
         if (usuario.usuario_activo === 0) {
-            return res.status(401).json({ mensaje: 'Tu cuenta ha sido desactivada. Contacta al administrador.' });
+            return res.status(401).json({ mensaje: 'Tu cuenta ha sido desactivada. Pongase en contacto con soporte.' });
         }
 
         // Comparamos la contraseña ingresada con el hash guardado en la BD
         const contrasenaValida = await bcrypt.compare(contrasena, usuario.usuario_contrasena);
         if (!contrasenaValida) {
-            return res.status(401).json({ mensaje: 'Credenciales inválidas.' });
+            return res.status(401).json({ mensaje: 'El usuario o contraseña son incorrectos.' });
         }
 
         // Generamos el token JWT con los datos del usuario
@@ -56,8 +59,11 @@ const login = async (req, res) => {
             token,
             rol: usuario.rol_nombre,
             nombre: usuario.usuario_nombre,
+            segundo_nombre: usuario.usuario_segundo_nombre || '',
             apellido: usuario.usuario_apellido,
-            asignatura: usuario.asignatura_nombre || ''
+            segundo_apellido: usuario.usuario_segundo_apellido || '',
+            asignatura: usuario.asignatura_nombre || '',
+            curso: usuario.curso_nombre || ''
         });
 
     } catch (error) {

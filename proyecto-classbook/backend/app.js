@@ -8,12 +8,15 @@ const db = require('./src/config/db');
 
 // Importamos las rutas
 const authRoutes = require('./src/routes/auth.routes');
+
 const usuariosRoutes = require('./src/routes/usuarios.routes');
 const cursosRoutes = require('./src/routes/cursos.routes');
 const asignaturasRoutes = require('./src/routes/asignaturas.routes');
 const historialRoutes = require('./src/routes/historial.routes');
 
 const docenteRoutes = require('./src/routes/docente.routes');
+
+const estudianteRoutes = require('./src/routes/estudiante.routes');
 
 // Inicializamos la aplicación Express
 const app = express();
@@ -24,12 +27,15 @@ app.use(express.json());  // Permite leer el body de las peticiones en formato J
 
 // Registramos las rutas con sus prefijos
 app.use('/auth', authRoutes);
+
 app.use('/usuarios', usuariosRoutes);
 app.use('/cursos', cursosRoutes);
 app.use('/asignaturas', asignaturasRoutes);
 app.use('/historial', historialRoutes);
 
 app.use('/docente', docenteRoutes);
+
+app.use('/estudiante', estudianteRoutes);
 
 // Ruta de prueba para verificar que el servidor está funcionando
 app.get('/', (req, res) => {
