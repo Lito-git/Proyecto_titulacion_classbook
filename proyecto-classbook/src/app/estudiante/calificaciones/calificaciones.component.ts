@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
 import { LINKS_ESTUDIANTE } from '../../shared/navbar.links';
 import Chart from 'chart.js/auto';
+import { FIRMA_DIRECTOR, TIMBRE_DIRECTOR } from '../../shared/images.constants';
 
 @Component({
   selector: 'app-calificaciones',
@@ -135,7 +136,6 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
     return 'nota-insuficiente';
   }
 
-  // Descarga el certificado PDF con jsPDF
   // Descarga el certificado PDF con jsPDF
   descargarPDF() {
     import('jspdf').then(({ jsPDF }) => {
@@ -284,21 +284,24 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
       doc.setTextColor(0, 0, 0);
       doc.setLineWidth(0.3);
       doc.setDrawColor(0, 0, 0);
+      
+      // Firma del director
+      doc.addImage(FIRMA_DIRECTOR, 'PNG', centerX - 30, firmasY - 28, 60, 22);
 
-      const firmas = [
-        { label: 'Apoderado(a) / Tutor(a)', x: 40 },
-        { label: 'Director(a)', x: 170 },
-      ];
+      doc.setLineWidth(0.3);
+      doc.setDrawColor(0, 0, 0);
+      doc.line(centerX - 35, firmasY, centerX + 35, firmasY);
 
-      firmas.forEach(({ label, x }) => {
-        doc.line(x - 28, firmasY, x + 28, firmasY);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8);
-        doc.text(label, x, firmasY + 6, { align: 'center' });
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(7);
-        doc.text('Nombre y RUT', x, firmasY + 11, { align: 'center' });
-      });
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(0, 0, 0);
+      doc.text('JORGE RAMIRO GONZALEZ ECHEVERRIA', centerX, firmasY + 6, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.text('DIRECTOR COLEGIO CRUZ DEL SUR ', centerX, firmasY + 11, { align: 'center' });
+
+      // Timbre del director
+      doc.addImage(TIMBRE_DIRECTOR, 'PNG', centerX + 5, firmasY - 45, 45, 45);
 
       // ─── PIE DE PÁGINA ───────────────────────────────────────────
       doc.setFillColor(23, 45, 68);
@@ -307,7 +310,7 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
       doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
       doc.text(
-        `Colegio Cruz del Sur  •  Documento generado en plataforma ClassBook el ${fecha}  •  Año Escolar ${anio}`,
+        `Colegio Cruz del Sur  •  Documento generado en plataforma ClassBook  y de uso interno del establecimiento, el ${fecha}  •  Año Escolar ${anio}`,
         centerX, pageHeight - 6, { align: 'center' }
       );
 
