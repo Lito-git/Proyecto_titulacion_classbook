@@ -10,6 +10,8 @@
     margin-left: 230px;
     padding: 40px;
     flex: 1;
+    min-width: 0;
+    /* Necesario para que ResizeObserver detecte cambios de ancho */
 }
 
 /* Encabezado */
@@ -111,6 +113,15 @@
     font-weight: 700;
     color: #0d2d5e;
     margin-bottom: 20px;
+}
+
+/* Wrapper del gráfico — overflow:hidden es clave para el resize responsivo */
+.grafico-wrapper {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    overflow: hidden;
+    /* 👈 fix principal */
 }
 
 /* Card tabla */

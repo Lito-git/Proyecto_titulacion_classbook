@@ -15,32 +15,26 @@ import { LINKS_DOCENTE } from '../../shared/navbar.links';
 })
 export class AnotacionesComponent implements OnInit {
 
-  // Links y ruta base para el navbar compartido
   links = LINKS_DOCENTE;
   rutaBase = '/docente';
 
-  // Lista de anotaciones y filtro activo
   anotaciones: any[] = [];
   filtroActivo: string = 'todas';
 
-  // Estudiantes del curso del docente
+  // Estudiantes de TODOS los cursos del docente
   estudiantes: any[] = [];
-  cursoId: number = 0;
 
-  // Formulario de registro
   formulario = {
     estudiante_id: 0,
     tipo: 'positiva',
     descripcion: ''
   };
 
-  // Variables para el buscador de estudiantes en el formulario
   busquedaEstudiante: string = '';
   estudiantesFiltrados: any[] = [];
   estudianteSeleccionado: any = null;
   mostrarSugerencias: boolean = false;
 
-  // Variable para el buscador en la lista de anotaciones
   busquedaAnotaciones: string = '';
   anotacionesFiltradas: any[] = [];
 
@@ -66,31 +60,18 @@ export class AnotacionesComponent implements OnInit {
     return JSON.parse(atob(token!.split('.')[1])).id;
   }
 
-  // Carga las anotaciones y los estudiantes del curso del docente
   cargarDatos() {
     const id = this.getDocenteId();
     this.cargarAnotaciones();
 
-    this.http.get<any[]>(`${this.apiUrl}/docente/${id}/asignaciones`, { headers: this.getHeaders() }).subscribe({
-      next: (data) => {
-        if (data.length > 0) {
-          this.cursoId = data[0].curso_id;
-          this.cargarEstudiantes();
-        }
-      },
-      error: (err) => console.error('Error al cargar asignaciones', err)
-    });
-  }
-
-  // Carga los estudiantes del curso asignado al docente
-  cargarEstudiantes() {
-    this.http.get<any[]>(`${this.apiUrl}/docente/curso/${this.cursoId}/estudiantes`, { headers: this.getHeaders() }).subscribe({
+    // Cargamos todos los estudiantes de todos los cursos del docente
+    // usando el nuevo endpoint /docente/:id/estudiantes
+    this.http.get<any[]>(`${this.apiUrl}/docente/${id}/estudiantes`, { headers: this.getHeaders() }).subscribe({
       next: (data) => this.estudiantes = data,
       error: (err) => console.error('Error al cargar estudiantes', err)
     });
   }
 
-  // Carga las anotaciones con filtro opcional por tipo
   cargarAnotaciones() {
     const id = this.getDocenteId();
     const url = this.filtroActivo === 'todas'
@@ -107,13 +88,11 @@ export class AnotacionesComponent implements OnInit {
     });
   }
 
-  // Cambia el filtro activo y recarga las anotaciones
   cambiarFiltro(filtro: string) {
     this.filtroActivo = filtro;
     this.cargarAnotaciones();
   }
 
-  // Filtra estudiantes en el buscador del formulario
   filtrarEstudiantes() {
     const texto = this.busquedaEstudiante.toLowerCase();
     if (texto.length < 2) {
@@ -128,7 +107,6 @@ export class AnotacionesComponent implements OnInit {
     this.mostrarSugerencias = true;
   }
 
-  // Selecciona un estudiante desde las sugerencias
   seleccionarEstudiante(est: any) {
     this.estudianteSeleccionado = est;
     this.formulario.estudiante_id = est.estudiante_id;
@@ -137,7 +115,6 @@ export class AnotacionesComponent implements OnInit {
     this.estudiantesFiltrados = [];
   }
 
-  // Limpia la selección del estudiante
   limpiarEstudiante() {
     this.estudianteSeleccionado = null;
     this.formulario.estudiante_id = 0;
@@ -146,7 +123,6 @@ export class AnotacionesComponent implements OnInit {
     this.mostrarSugerencias = false;
   }
 
-  // Filtra la lista de anotaciones por nombre de estudiante
   filtrarAnotaciones() {
     const texto = this.busquedaAnotaciones.toLowerCase();
     if (!texto) {
@@ -159,7 +135,6 @@ export class AnotacionesComponent implements OnInit {
     });
   }
 
-  // Registra una nueva anotación
   registrarAnotacion() {
     this.mensajeExito = '';
     this.mensajeError = '';
@@ -189,7 +164,6 @@ export class AnotacionesComponent implements OnInit {
     });
   }
 
-  // Formatea la fecha al formato dd-mm-yyyy
   formatearFecha(fecha: string): string {
     const d = new Date(fecha);
     const dia = d.getDate().toString().padStart(2, '0');

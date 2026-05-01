@@ -2,12 +2,13 @@
 const express = require('express');
 const router = express.Router();
 const verificarToken = require('../middleware/auth');
-const { obtenerHistorial } = require('../controllers/historial.controller');
+const { obtenerHistorial, obtenerTotalHistorial } = require('../controllers/historial.controller');
 
-// Todas las rutas requieren token JWT válido
+// GET /historial/total → total de registros para el dashboard
+// IMPORTANTE: esta ruta debe ir ANTES de la ruta GET / para que no sea interceptada
+router.get('/total', verificarToken, obtenerTotalHistorial);
 
-// GET /historial -> obtiene todos los registros del historial con filtros opcionales
-// Parámetros query opcionales: tipo, usuario_id, fecha_inicio, fecha_fin
+// GET /historial → historial completo con filtros opcionales
 router.get('/', verificarToken, obtenerHistorial);
 
 module.exports = router;

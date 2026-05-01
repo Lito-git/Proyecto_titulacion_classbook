@@ -7,11 +7,10 @@ import { CanActivate, ActivatedRouteSnapshot, Router } from '@angular/router';
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   canActivate(route: ActivatedRouteSnapshot): boolean {
 
-    // Obtenemos el token guardado en sessionStorage
     const token = sessionStorage.getItem('token');
 
     // Si no hay token, redirigimos al login
@@ -20,20 +19,32 @@ export class AuthGuard implements CanActivate {
       return false;
     }
 
-    // Obtenemos el rol del usuario guardado en sessionStorage
-    const rolUsuario = sessionStorage.getItem('rol');
+    // Verificamos que el token no haya expirado decodificando el payload
+    // sin necesidad de una librería externa (el payload es base64 estándar)
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // exp está en segundos, Date.now() en milisegundos
+      if (payload.exp * 1000 < Date.now()) {
+        sessionStorage.clear();
+        this.router.navigate(['/login']);
+        return false;
+      }
+    } catch {
+      // Token malformado
+      sessionStorage.clear();
+      this.router.navigate(['/login']);
+      return false;
+    }
 
-    // Obtenemos los roles permitidos definidos en la ruta
+    // Verificamos que el usuario tenga el rol permitido para esta ruta
+    const rolUsuario = sessionStorage.getItem('rol');
     const rolesPermitidos = route.data['roles'] as string[];
 
-    // Si la ruta tiene roles definidos y el usuario no tiene el rol correcto
-    // lo redirigimos al login
     if (rolesPermitidos && !rolesPermitidos.includes(rolUsuario || '')) {
       this.router.navigate(['/login']);
       return false;
     }
 
-    // Si todo está bien, permitimos el acceso
     return true;
   }
 }

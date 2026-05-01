@@ -2,59 +2,66 @@
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { enviarContrasenaTemp, notificarCambioContrasena } = require('../config/mailer');
 
 // Controlador de login
-// Valida las credenciales del usuario y retorna un token JWT si son correctas
 const login = async (req, res) => {
     const { email, contrasena } = req.body;
 
     try {
-        // Buscamos el usuario por email junto con el nombre de su rol y asignatura si es docente
+        // Buscamos el usuario por email — LIMIT 1 para evitar duplicados si el docente
+        // tiene múltiples asignaciones (el JOIN con docente_asignatura puede retornar N filas)
         const [usuarios] = await db.query(
-            `SELECT u.usuario_id, u.usuario_nombre, u.usuario_segundo_nombre, u.usuario_apellido, u.usuario_segundo_apellido, u.usuario_email, u.usuario_contrasena,
-    u.usuario_activo, r.rol_nombre, a.asignatura_nombre, c.curso_nombre
-            FROM usuarios u
-            JOIN roles r ON u.usuario_rol_id = r.rol_id
-            LEFT JOIN docente_asignatura da ON da.docente_usuario_id = u.usuario_id
-            LEFT JOIN asignaturas a ON a.asignatura_id = da.asignatura_id
-            LEFT JOIN estudiantes e ON e.estudiante_usuario_id = u.usuario_id
-            LEFT JOIN cursos c ON c.curso_id = e.estudiante_curso_id
-            WHERE u.usuario_email = ?`,
+            `SELECT u.usuario_id, u.usuario_nombre, u.usuario_segundo_nombre, u.usuario_apellido,
+                    u.usuario_segundo_apellido, u.usuario_email, u.usuario_contrasena,
+                    u.usuario_activo, r.rol_nombre, c.curso_nombre
+             FROM usuarios u
+             JOIN roles r ON u.usuario_rol_id = r.rol_id
+             LEFT JOIN estudiantes e ON e.estudiante_usuario_id = u.usuario_id
+             LEFT JOIN cursos c ON c.curso_id = e.estudiante_curso_id
+             WHERE u.usuario_email = ?
+             LIMIT 1`,
             [email]
         );
 
-        // Si no existe el usuario retornamos error
         if (usuarios.length === 0) {
             return res.status(401).json({ mensaje: 'El usuario o contraseña son incorrectos.' });
         }
 
         const usuario = usuarios[0];
 
-        // Verificamos que el usuario esté activo
         if (usuario.usuario_activo === 0) {
             return res.status(401).json({ mensaje: 'Tu cuenta ha sido desactivada. Pongase en contacto con soporte.' });
         }
 
-        // Comparamos la contraseña ingresada con el hash guardado en la BD
         const contrasenaValida = await bcrypt.compare(contrasena, usuario.usuario_contrasena);
         if (!contrasenaValida) {
             return res.status(401).json({ mensaje: 'El usuario o contraseña son incorrectos.' });
         }
 
-        // Generamos el token JWT con los datos del usuario
-        // El token expira en 8 horas (duración de una jornada académica)
+        // Si es docente, buscamos su asignatura principal por separado
+        let asignaturaNombre = '';
+        if (usuario.rol_nombre === 'docente') {
+            const [asignaciones] = await db.query(
+                `SELECT a.asignatura_nombre
+                 FROM docente_asignatura da
+                 JOIN asignaturas a ON a.asignatura_id = da.asignatura_id
+                 WHERE da.docente_usuario_id = ?
+                 LIMIT 1`,
+                [usuario.usuario_id]
+            );
+            if (asignaciones.length > 0) {
+                asignaturaNombre = asignaciones[0].asignatura_nombre;
+            }
+        }
+
         const token = jwt.sign(
-            {
-                id: usuario.usuario_id,
-                email: usuario.usuario_email,
-                rol: usuario.rol_nombre
-            },
+            { id: usuario.usuario_id, email: usuario.usuario_email, rol: usuario.rol_nombre },
             process.env.JWT_SECRET,
             { expiresIn: '8h' }
         );
 
-        // Retornamos el token y los datos básicos del usuario
         res.json({
             token,
             rol: usuario.rol_nombre,
@@ -62,7 +69,7 @@ const login = async (req, res) => {
             segundo_nombre: usuario.usuario_segundo_nombre || '',
             apellido: usuario.usuario_apellido,
             segundo_apellido: usuario.usuario_segundo_apellido || '',
-            asignatura: usuario.asignatura_nombre || '',
+            asignatura: asignaturaNombre,
             curso: usuario.curso_nombre || ''
         });
 
@@ -72,7 +79,6 @@ const login = async (req, res) => {
 };
 
 // Controlador de cambio de contraseña
-// Permite al usuario cambiar su contraseña ingresando la actual y la nueva
 const cambiarContrasena = async (req, res) => {
     const { contrasenaActual, contrasenaNueva } = req.body;
     const usuarioId = req.usuario.id;
@@ -101,7 +107,6 @@ const cambiarContrasena = async (req, res) => {
             [hashNueva, usuarioId]
         );
 
-        // Enviamos notificación por correo al usuario
         await notificarCambioContrasena(usuario.usuario_email, usuario.usuario_nombre);
 
         res.json({ mensaje: 'Contraseña actualizada correctamente.' });
@@ -112,12 +117,11 @@ const cambiarContrasena = async (req, res) => {
 };
 
 // Controlador de recuperación de contraseña
-// Genera una nueva contraseña temporal y la envía al correo del usuario
+// Usa crypto para generar contraseña temporal segura
 const recuperarContrasena = async (req, res) => {
     const { email } = req.body;
 
     try {
-        // Verificamos que el email esté registrado en la BD
         const [usuarios] = await db.query(
             'SELECT * FROM usuarios WHERE usuario_email = ?',
             [email]
@@ -129,24 +133,20 @@ const recuperarContrasena = async (req, res) => {
 
         const usuario = usuarios[0];
 
-        // Verificamos que el usuario esté activo
         if (usuario.usuario_activo === 0) {
             return res.status(401).json({ mensaje: 'Tu cuenta ha sido desactivada. Contacta al administrador.' });
         }
 
-        // Generamos una contraseña temporal aleatoria
-        const contrasenaTemp = Math.random().toString(36).slice(-10).toUpperCase();
+        // Contraseña temporal criptográficamente segura (12 chars hex)
+        const contrasenaTemp = crypto.randomBytes(6).toString('hex').toUpperCase();
 
-        // Encriptamos la contraseña temporal
         const hash = await bcrypt.hash(contrasenaTemp, 10);
 
-        // Actualizamos la contraseña en la BD
         await db.query(
             'UPDATE usuarios SET usuario_contrasena = ? WHERE usuario_id = ?',
             [hash, usuario.usuario_id]
         );
 
-        // Enviamos la nueva contraseña temporal por correo
         await enviarContrasenaTemp(email, usuario.usuario_nombre, contrasenaTemp, true);
 
         res.json({ mensaje: 'Se envió una nueva contraseña temporal a tu correo.' });

@@ -6,7 +6,6 @@ const obtenerResumenEstudiante = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Obtenemos el estudiante_id a partir del usuario_id
         const [estudiante] = await db.query(
             'SELECT estudiante_id, estudiante_curso_id FROM estudiantes WHERE estudiante_usuario_id = ?',
             [id]
@@ -18,62 +17,57 @@ const obtenerResumenEstudiante = async (req, res) => {
 
         const estudianteId = estudiante[0].estudiante_id;
 
-        // Promedio general de todas las calificaciones del estudiante
         const [promedio] = await db.query(
             `SELECT ROUND(AVG(calificacion_nota), 1) AS promedio
-       FROM calificaciones
-       WHERE calificacion_estudiante_id = ?`,
+             FROM calificaciones
+             WHERE calificacion_estudiante_id = ?`,
             [estudianteId]
         );
 
-        // Total anotaciones positivas del estudiante
         const [anotacionesPositivas] = await db.query(
             `SELECT COUNT(*) AS total
-       FROM anotaciones
-       WHERE anotacion_estudiante_id = ? AND anotacion_tipo = 'positiva'`,
+             FROM anotaciones
+             WHERE anotacion_estudiante_id = ? AND anotacion_tipo = 'positiva'`,
             [estudianteId]
         );
 
-        // Total evaluaciones registradas este mes
         const [evaluacionesMes] = await db.query(
             `SELECT COUNT(*) AS total
-       FROM calificaciones
-       WHERE calificacion_estudiante_id = ?
-       AND MONTH(calificacion_fecha_registro) = MONTH(NOW())
-       AND YEAR(calificacion_fecha_registro) = YEAR(NOW())`,
+             FROM calificaciones
+             WHERE calificacion_estudiante_id = ?
+             AND MONTH(calificacion_fecha_registro) = MONTH(NOW())
+             AND YEAR(calificacion_fecha_registro) = YEAR(NOW())`,
             [estudianteId]
         );
 
-        // Actividad reciente: últimas calificaciones y anotaciones positivas
         const [calRecientes] = await db.query(
-            `SELECT 
-        'calificacion' AS tipo,
-        a.asignatura_nombre,
-        c.calificacion_tipo,
-        c.calificacion_numero,
-        c.calificacion_nota,
-        c.calificacion_fecha_registro AS fecha
-       FROM calificaciones c
-       JOIN asignaturas a ON a.asignatura_id = c.calificacion_asignatura_id
-       WHERE c.calificacion_estudiante_id = ?
-       ORDER BY c.calificacion_fecha_registro DESC
-       LIMIT 3`,
+            `SELECT
+                'calificacion' AS tipo,
+                a.asignatura_nombre,
+                c.calificacion_tipo,
+                c.calificacion_numero,
+                c.calificacion_nota,
+                c.calificacion_fecha_registro AS fecha
+             FROM calificaciones c
+             JOIN asignaturas a ON a.asignatura_id = c.calificacion_asignatura_id
+             WHERE c.calificacion_estudiante_id = ?
+             ORDER BY c.calificacion_fecha_registro DESC
+             LIMIT 3`,
             [estudianteId]
         );
 
         const [anotRecientes] = await db.query(
-            `SELECT 
-        'anotacion' AS tipo,
-        an.anotacion_descripcion,
-        an.anotacion_fecha AS fecha
-       FROM anotaciones an
-       WHERE an.anotacion_estudiante_id = ? AND an.anotacion_tipo = 'positiva'
-       ORDER BY an.anotacion_fecha DESC
-       LIMIT 3`,
+            `SELECT
+                'anotacion' AS tipo,
+                an.anotacion_descripcion,
+                an.anotacion_fecha AS fecha
+             FROM anotaciones an
+             WHERE an.anotacion_estudiante_id = ? AND an.anotacion_tipo = 'positiva'
+             ORDER BY an.anotacion_fecha DESC
+             LIMIT 3`,
             [estudianteId]
         );
 
-        // Combinamos y ordenamos la actividad reciente por fecha
         const actividad = [...calRecientes, ...anotRecientes]
             .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
             .slice(0, 5);
@@ -96,7 +90,6 @@ const obtenerCalificaciones = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Obtenemos el estudiante_id
         const [estudiante] = await db.query(
             'SELECT estudiante_id FROM estudiantes WHERE estudiante_usuario_id = ?',
             [id]
@@ -108,25 +101,22 @@ const obtenerCalificaciones = async (req, res) => {
 
         const estudianteId = estudiante[0].estudiante_id;
 
-        // Obtenemos las asignaturas con sus calificaciones
         const [asignaturas] = await db.query(
             `SELECT DISTINCT a.asignatura_id, a.asignatura_nombre
-       FROM calificaciones c
-       JOIN asignaturas a ON a.asignatura_id = c.calificacion_asignatura_id
-       WHERE c.calificacion_estudiante_id = ?`,
+             FROM calificaciones c
+             JOIN asignaturas a ON a.asignatura_id = c.calificacion_asignatura_id
+             WHERE c.calificacion_estudiante_id = ?`,
             [estudianteId]
         );
 
-        // Para cada asignatura obtenemos sus calificaciones
         const resultado = await Promise.all(asignaturas.map(async (asig) => {
             const [calificaciones] = await db.query(
                 `SELECT calificacion_tipo, calificacion_numero, calificacion_nota
-         FROM calificaciones
-         WHERE calificacion_estudiante_id = ? AND calificacion_asignatura_id = ?`,
+                 FROM calificaciones
+                 WHERE calificacion_estudiante_id = ? AND calificacion_asignatura_id = ?`,
                 [estudianteId, asig.asignatura_id]
             );
 
-            // Calculamos el promedio de la asignatura
             const promedio = calificaciones.length > 0
                 ? (calificaciones.reduce((acc, c) => acc + parseFloat(c.calificacion_nota), 0) / calificaciones.length).toFixed(1)
                 : null;
@@ -134,7 +124,6 @@ const obtenerCalificaciones = async (req, res) => {
             return { ...asig, calificaciones, promedio };
         }));
 
-        // Promedio general
         const todasLasNotas = resultado.flatMap(a => a.calificaciones.map(c => parseFloat(c.calificacion_nota)));
         const promedioGeneral = todasLasNotas.length > 0
             ? (todasLasNotas.reduce((a, b) => a + b, 0) / todasLasNotas.length).toFixed(1)
@@ -148,11 +137,11 @@ const obtenerCalificaciones = async (req, res) => {
 };
 
 // Obtener anotaciones positivas del estudiante
+// Fix: subquery para evitar duplicados cuando el profesor tiene múltiples cursos asignados
 const obtenerAnotacionesPositivas = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Obtenemos el estudiante_id
         const [estudiante] = await db.query(
             'SELECT estudiante_id FROM estudiantes WHERE estudiante_usuario_id = ?',
             [id]
@@ -164,31 +153,32 @@ const obtenerAnotacionesPositivas = async (req, res) => {
 
         const estudianteId = estudiante[0].estudiante_id;
 
-        // Obtenemos las anotaciones positivas con nombre del profesor y asignatura
+        // Subquery para traer solo una asignatura por profesor y evitar duplicados
         const [anotaciones] = await db.query(
-            `SELECT 
-        an.anotacion_id,
-        an.anotacion_descripcion,
-        an.anotacion_fecha,
-        u.usuario_nombre AS profesor_nombre,
-        u.usuario_segundo_nombre AS profesor_segundo_nombre,
-        u.usuario_apellido AS profesor_apellido,
-        u.usuario_segundo_apellido AS profesor_segundo_apellido,
-        a.asignatura_nombre
-       FROM anotaciones an
-       JOIN usuarios u ON u.usuario_id = an.anotacion_profesor_id
-       LEFT JOIN docente_asignatura da ON da.docente_usuario_id = an.anotacion_profesor_id
-       LEFT JOIN asignaturas a ON a.asignatura_id = da.asignatura_id
-       WHERE an.anotacion_estudiante_id = ? AND an.anotacion_tipo = 'positiva'
-       ORDER BY an.anotacion_fecha DESC`,
+            `SELECT
+                an.anotacion_id,
+                an.anotacion_descripcion,
+                an.anotacion_fecha,
+                u.usuario_nombre AS profesor_nombre,
+                u.usuario_segundo_nombre AS profesor_segundo_nombre,
+                u.usuario_apellido AS profesor_apellido,
+                u.usuario_segundo_apellido AS profesor_segundo_apellido,
+                (SELECT a2.asignatura_nombre
+                 FROM docente_asignatura da2
+                 JOIN asignaturas a2 ON a2.asignatura_id = da2.asignatura_id
+                 WHERE da2.docente_usuario_id = an.anotacion_profesor_id
+                 LIMIT 1) AS asignatura_nombre
+             FROM anotaciones an
+             JOIN usuarios u ON u.usuario_id = an.anotacion_profesor_id
+             WHERE an.anotacion_estudiante_id = ? AND an.anotacion_tipo = 'positiva'
+             ORDER BY an.anotacion_fecha DESC`,
             [estudianteId]
         );
 
-        // Total anotaciones positivas este semestre
         const [totalSemestre] = await db.query(
             `SELECT COUNT(*) AS total
-       FROM anotaciones
-       WHERE anotacion_estudiante_id = ? AND anotacion_tipo = 'positiva'`,
+             FROM anotaciones
+             WHERE anotacion_estudiante_id = ? AND anotacion_tipo = 'positiva'`,
             [estudianteId]
         );
 

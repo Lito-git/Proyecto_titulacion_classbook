@@ -1,16 +1,15 @@
 // Importamos la conexión a la base de datos
 const db = require('../config/db');
 
-
 // Obtener todos los cursos con el conteo de estudiantes matriculados
 const obtenerCursos = async (req, res) => {
     try {
         const [cursos] = await db.query(
             `SELECT c.*, COUNT(e.estudiante_id) AS total_estudiantes
-       FROM cursos c
-       LEFT JOIN estudiantes e ON e.estudiante_curso_id = c.curso_id
-       GROUP BY c.curso_id
-       ORDER BY c.curso_id ASC`
+             FROM cursos c
+             LEFT JOIN estudiantes e ON e.estudiante_curso_id = c.curso_id
+             GROUP BY c.curso_id
+             ORDER BY c.curso_id ASC`
         );
         res.json(cursos);
     } catch (error) {
@@ -22,7 +21,6 @@ const obtenerCursos = async (req, res) => {
 const crearCurso = async (req, res) => {
     const { nombre, nivel } = req.body;
     try {
-        // Concatenamos nivel + nombre para formar el nombre completo del curso
         const nombreCompleto = `${nivel} ${nombre}`;
         await db.query(
             'INSERT INTO cursos (curso_nombre, curso_nivel) VALUES (?, ?)',
@@ -39,7 +37,6 @@ const editarCurso = async (req, res) => {
     const { id } = req.params;
     const { nombre, nivel } = req.body;
     try {
-        // Concatenamos nivel + nombre para formar el nombre completo del curso
         const nombreCompleto = `${nivel} ${nombre}`;
         await db.query(
             'UPDATE cursos SET curso_nombre = ?, curso_nivel = ? WHERE curso_id = ?',
@@ -51,10 +48,32 @@ const editarCurso = async (req, res) => {
     }
 };
 
-// Eliminar un curso
+// Eliminar un curso — verifica dependencias antes de borrar
 const eliminarCurso = async (req, res) => {
     const { id } = req.params;
     try {
+        // Verificamos si hay estudiantes matriculados en el curso
+        const [conEstudiantes] = await db.query(
+            'SELECT COUNT(*) AS total FROM estudiantes WHERE estudiante_curso_id = ?',
+            [id]
+        );
+        if (conEstudiantes[0].total > 0) {
+            return res.status(400).json({
+                mensaje: 'No se puede eliminar: el curso tiene estudiantes matriculados.'
+            });
+        }
+
+        // Verificamos si hay docentes asignados al curso
+        const [conDocentes] = await db.query(
+            'SELECT COUNT(*) AS total FROM docente_asignatura WHERE curso_id = ?',
+            [id]
+        );
+        if (conDocentes[0].total > 0) {
+            return res.status(400).json({
+                mensaje: 'No se puede eliminar: el curso tiene docentes asignados.'
+            });
+        }
+
         await db.query('DELETE FROM cursos WHERE curso_id = ?', [id]);
         res.json({ mensaje: 'Curso eliminado correctamente.' });
     } catch (error) {

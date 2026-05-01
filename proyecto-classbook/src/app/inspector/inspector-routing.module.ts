@@ -1,13 +1,17 @@
 // Módulo de rutas del panel inspector
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { CambiarContrasenaComponent } from '../shared/cambiar-contrasena/cambiar-contrasena.component';
+import { InicioComponent } from './inicio/inicio.component';
+import { ReportesComponent } from './reportes/reportes.component';
+import { AnotacionesComponent } from './anotaciones/anotaciones.component';
+import { CambiarContrasenaInspectorComponent } from './cambiar-contrasena/cambiar-contrasena.component';
 
 // Rutas disponibles para el rol inspector
 const routes: Routes = [
-  { path: '', component: DashboardComponent },                           // Vista principal del inspector
-  { path: 'cambiar-contrasena', component: CambiarContrasenaComponent } // Vista de cambio de contraseña
+  { path: '', component: InicioComponent },
+  { path: 'reportes', component: ReportesComponent },
+  { path: 'anotaciones', component: AnotacionesComponent },
+  { path: 'cambiar-contrasena', component: CambiarContrasenaInspectorComponent }
 ];
 
 @NgModule({

@@ -1,0 +1,130 @@
+<!-- Layout principal -->
+<div class="layout">
+
+    <!-- Navbar compartido -->
+    <app-navbar [links]="links" [rutaBase]="rutaBase"></app-navbar>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+
+        <!-- Saludo -->
+        <h1 class="titulo">Bienvenido/a, {{ nombre }}</h1>
+        <p class="subtitulo">Panel de seguimiento académico y conductual</p>
+
+        <!-- Tarjetas de resumen -->
+        <div class="tarjetas">
+            <div class="tarjeta">
+                <span class="tarjeta-icon azul">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="8" r="6" />
+                        <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+                    </svg>
+                </span>
+                <h2 class="tarjeta-numero">{{ promedioGeneral || '-' }}</h2>
+                <p class="tarjeta-label">Promedio General Establecimiento</p>
+            </div>
+
+            <div class="tarjeta">
+                <span class="tarjeta-icon verde">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                        <polyline points="16 7 22 7 22 13" />
+                    </svg>
+                </span>
+                <h2 class="tarjeta-numero">{{ anotacionesPositivasMes }}</h2>
+                <p class="tarjeta-label">Anotaciones Positivas este Mes</p>
+            </div>
+
+            <div class="tarjeta">
+                <span class="tarjeta-icon rojo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="#d93025" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 17 13.5 8.5 8.5 13.5 2 7" />
+                        <polyline points="16 17 22 17 22 11" />
+                    </svg>
+                </span>
+                <h2 class="tarjeta-numero">{{ anotacionesNegativasMes }}</h2>
+                <p class="tarjeta-label">Anotaciones Negativas este Mes</p>
+            </div>
+
+            <div class="tarjeta">
+                <span class="tarjeta-icon naranja">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="#e37400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                </span>
+                <h2 class="tarjeta-numero">{{ casosSeguimiento }}</h2>
+                <p class="tarjeta-label">Casos que Requieren Seguimiento</p>
+            </div>
+        </div>
+
+        <!-- Rendimiento por curso -->
+        <div class="card">
+            <h3 class="card-titulo">Rendimiento por Curso</h3>
+            <div class="sin-datos" *ngIf="cursos.length === 0">No hay datos de cursos disponibles.</div>
+            <div class="curso-item" *ngFor="let curso of cursos">
+                <div class="curso-info">
+                    <span class="curso-nombre">{{ curso.curso_nombre }}</span>
+                    <div class="curso-meta">
+                        <span class="meta-estudiantes">{{ curso.total_estudiantes }} estudiantes</span>
+                        <span class="meta-positivas">{{ curso.anotaciones_positivas }} anotaciones positivas</span>
+                        <span class="meta-negativas">{{ curso.anotaciones_negativas }} anotaciones negativas</span>
+                    </div>
+                </div>
+                <div class="curso-promedio">
+                    <span class="promedio-numero">{{ curso.promedio || '-' }}</span>
+                    <span class="promedio-label">Promedio</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas recientes -->
+        <div class="card">
+            <h3 class="card-titulo">Alertas Recientes</h3>
+            <div class="sin-datos" *ngIf="alertasNegativas.length === 0 && alertasRendimiento.length === 0">
+                No hay alertas recientes.
+            </div>
+
+            <!-- Alertas por anotaciones negativas -->
+            <div class="alerta-item" *ngFor="let alerta of alertasNegativas">
+                <span class="alerta-icon naranja">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="#e37400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                </span>
+                <div class="alerta-info">
+                    <span class="alerta-titulo">{{ getNombreCompleto(alerta) }} - {{ alerta.curso_nombre }}</span>
+                    <span class="alerta-detalle">{{ alerta.total_negativas }} anotaciones negativas en la última semana.
+                        Requiere seguimiento.</span>
+                </div>
+                <span class="alerta-tiempo">{{ tiempoRelativo(alerta.ultima_fecha) }}</span>
+            </div>
+
+            <!-- Alertas por rendimiento bajo -->
+            <div class="alerta-item" *ngFor="let alerta of alertasRendimiento">
+                <span class="alerta-icon rojo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="#d93025" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 17 13.5 8.5 8.5 13.5 2 7" />
+                        <polyline points="16 17 22 17 22 11" />
+                    </svg>
+                </span>
+                <div class="alerta-info">
+                    <span class="alerta-titulo">{{ alerta.curso_nombre }} - {{ alerta.asignatura_nombre }}</span>
+                    <span class="alerta-detalle">Promedio {{ alerta.promedio }} en última evaluación. Considerar
+                        reforzamiento.</span>
+                </div>
+                <span class="alerta-tiempo">{{ tiempoRelativo(alerta.ultima_fecha) }}</span>
+            </div>
+        </div>
+
+    </main>
+</div>

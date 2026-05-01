@@ -1,13 +1,9 @@
-<!-- Layout principal -->
 <div class="layout">
 
-    <!-- Navbar compartido -->
     <app-navbar [links]="links" [rutaBase]="rutaBase"></app-navbar>
 
-    <!-- Contenido principal -->
     <main class="contenido">
 
-        <!-- Encabezado -->
         <div class="encabezado">
             <div>
                 <h1 class="titulo">Mis Calificaciones</h1>
@@ -44,7 +40,10 @@
         <!-- Gráfico -->
         <div class="grafico-card" *ngIf="mostrarGrafico">
             <h3 class="card-titulo">Rendimiento por Asignatura</h3>
-            <canvas #graficoCanvas></canvas>
+            <!-- Wrapper con altura fija para que Chart.js renderice correctamente -->
+            <div class="grafico-wrapper">
+                <canvas #graficoCanvas></canvas>
+            </div>
         </div>
 
         <!-- Tabla de calificaciones -->

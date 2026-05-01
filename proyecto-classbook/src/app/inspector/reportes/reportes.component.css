@@ -1,0 +1,226 @@
+/* Layout principal */
+.layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+/* Contenido principal */
+.contenido {
+    margin-left: 230px;
+    padding: 40px;
+    flex: 1;
+    /* Necesario para que el ResizeObserver detecte cambios de ancho */
+    min-width: 0;
+}
+
+/* Títulos */
+.titulo {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #0d2d5e;
+    margin-bottom: 4px;
+}
+
+.subtitulo {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 24px;
+}
+
+/* Card filtros */
+.filtros-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    margin-bottom: 24px;
+}
+
+.filtros-titulo {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0d2d5e;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filtros-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+/* Campos */
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.campo label {
+    font-size: 13px;
+    color: #555;
+}
+
+.campo select {
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    background-color: #ffffff;
+    transition: border-color 0.2s;
+}
+
+.campo select:focus {
+    border-color: #e37400;
+}
+
+/* Buscador de estudiante */
+.buscador-container {
+    position: relative;
+}
+
+.buscador-container input {
+    width: 100%;
+    padding: 10px 36px 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+    background-color: #ffffff;
+}
+
+.buscador-container input:focus {
+    border-color: #e37400;
+}
+
+.btn-limpiar-est {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    font-size: 14px;
+    padding: 0;
+    width: auto;
+    margin: 0;
+}
+
+.sugerencias {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.sugerencia-item {
+    padding: 10px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #333;
+    transition: background-color 0.15s;
+}
+
+.sugerencia-item:hover {
+    background-color: #fff3e0;
+    color: #e37400;
+}
+
+/* Tarjeta promedio general */
+.tarjeta-promedio {
+    background: linear-gradient(135deg, #e37400, #f59e0b);
+    border-radius: 8px;
+    padding: 24px 32px;
+    margin-bottom: 24px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.promedio-label {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-bottom: 4px;
+}
+
+.promedio-numero {
+    font-size: 42px;
+    font-weight: 800;
+}
+
+/* Card gráfico */
+.grafico-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    margin-bottom: 24px;
+}
+
+.card-titulo {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0d2d5e;
+    margin-bottom: 20px;
+}
+
+/* Wrapper del gráfico — overflow:hidden es clave para el resize responsivo */
+.grafico-wrapper {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    overflow: hidden;
+    /* 👈 fix principal */
+}
+
+/* Sin datos */
+.sin-datos {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 48px;
+    text-align: center;
+    font-size: 14px;
+    color: #999;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .contenido {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .filtros-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tarjeta-promedio {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .buscador-container {
+        width: 100%;
+    }
+}

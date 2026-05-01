@@ -1,28 +1,35 @@
 // Importamos las dependencias necesarias
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const { enviarContrasenaTemp } = require('../config/mailer');
 
-// Función auxiliar para generar una contraseña temporal aleatoria
+// Función auxiliar para generar una contraseña temporal segura
 const generarContrasenaTemp = () => {
-    // Generamos una contraseña de 10 caracteres con letras y números
-    return Math.random().toString(36).slice(-10).toUpperCase();
+    return crypto.randomBytes(6).toString('hex').toUpperCase();
 };
 
 // Obtener todos los usuarios con su curso y asignatura según rol
 const obtenerUsuarios = async (req, res) => {
     try {
         const [usuarios] = await db.query(
-            `SELECT u.usuario_id, u.usuario_nombre, u.usuario_segundo_nombre, u.usuario_apellido, u.usuario_segundo_apellido, u.usuario_email, u.usuario_fecha_registro, u.usuario_activo,
-        u.usuario_rol_id, r.rol_nombre, c_est.curso_nombre AS estudiante_curso, c_doc.curso_nombre AS docente_curso, a.asignatura_nombre AS docente_asignatura
-       FROM usuarios u
-       JOIN roles r ON u.usuario_rol_id = r.rol_id
-       LEFT JOIN estudiantes e ON e.estudiante_usuario_id = u.usuario_id
-       LEFT JOIN cursos c_est ON c_est.curso_id = e.estudiante_curso_id
-       LEFT JOIN docente_asignatura da ON da.docente_usuario_id = u.usuario_id
-       LEFT JOIN cursos c_doc ON c_doc.curso_id = da.curso_id
-       LEFT JOIN asignaturas a ON a.asignatura_id = da.asignatura_id
-       ORDER BY u.usuario_id ASC`
+            `SELECT u.usuario_id, u.usuario_nombre, u.usuario_segundo_nombre, u.usuario_apellido,
+                    u.usuario_segundo_apellido, u.usuario_email, u.usuario_fecha_registro, u.usuario_activo,
+                    u.usuario_rol_id, r.rol_nombre,
+                    c_est.curso_nombre AS estudiante_curso,
+                    MAX(c_doc.curso_nombre) AS docente_curso,
+                    MAX(a.asignatura_nombre) AS docente_asignatura
+             FROM usuarios u
+             JOIN roles r ON u.usuario_rol_id = r.rol_id
+             LEFT JOIN estudiantes e ON e.estudiante_usuario_id = u.usuario_id
+             LEFT JOIN cursos c_est ON c_est.curso_id = e.estudiante_curso_id
+             LEFT JOIN docente_asignatura da ON da.docente_usuario_id = u.usuario_id
+             LEFT JOIN cursos c_doc ON c_doc.curso_id = da.curso_id
+             LEFT JOIN asignaturas a ON a.asignatura_id = da.asignatura_id
+             GROUP BY u.usuario_id, u.usuario_nombre, u.usuario_segundo_nombre, u.usuario_apellido,
+                      u.usuario_segundo_apellido, u.usuario_email, u.usuario_fecha_registro, u.usuario_activo,
+                      u.usuario_rol_id, r.rol_nombre, c_est.curso_nombre
+             ORDER BY u.usuario_id ASC`
         );
         res.json(usuarios);
     } catch (error) {
@@ -30,62 +37,80 @@ const obtenerUsuarios = async (req, res) => {
     }
 };
 
-// Crear un nuevo usuario
-// Genera contraseña temporal y la envía por correo
-// Si es docente, registra en docente_asignatura
-// Si es estudiante, registra en estudiantes
+// Crear un nuevo usuario con transacción para evitar datos huérfanos
 const crearUsuario = async (req, res) => {
     const { nombre, segundo_nombre, apellido, segundo_apellido, email, rol_id, rut, fecha_nacimiento, curso_id, asignatura_id } = req.body;
 
+    // Obtenemos una conexión del pool para usar transacción
+    const conn = await db.getConnection();
+
     try {
-        const [existe] = await db.query(
+        const [existe] = await conn.query(
             'SELECT usuario_id FROM usuarios WHERE usuario_email = ?',
             [email]
         );
 
         if (existe.length > 0) {
+            conn.release();
             return res.status(400).json({ mensaje: 'El correo ya está registrado.' });
         }
 
         const contrasenaTemp = generarContrasenaTemp();
         const hash = await bcrypt.hash(contrasenaTemp, 10);
 
-        const [resultado] = await db.query(
-            `INSERT INTO usuarios (usuario_nombre, usuario_segundo_nombre, usuario_apellido, usuario_segundo_apellido, usuario_email, usuario_contrasena, usuario_rol_id) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        // Iniciamos la transacción — si algo falla, se revierte todo
+        await conn.beginTransaction();
+
+        const [resultado] = await conn.query(
+            `INSERT INTO usuarios (usuario_nombre, usuario_segundo_nombre, usuario_apellido,
+                                   usuario_segundo_apellido, usuario_email, usuario_contrasena, usuario_rol_id)
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [nombre, segundo_nombre || null, apellido, segundo_apellido || null, email, hash, rol_id]
         );
 
         const nuevoUsuarioId = resultado.insertId;
-        const [roles] = await db.query('SELECT rol_nombre FROM roles WHERE rol_id = ?', [rol_id]);
+
+        const [roles] = await conn.query('SELECT rol_nombre FROM roles WHERE rol_id = ?', [rol_id]);
         const rolNombre = roles[0].rol_nombre;
 
         if (rolNombre === 'estudiante') {
             if (!rut || !curso_id) {
+                await conn.rollback();
+                conn.release();
                 return res.status(400).json({ mensaje: 'El RUT y el curso son obligatorios para estudiantes.' });
             }
-            await db.query(
+            await conn.query(
                 `INSERT INTO estudiantes (estudiante_usuario_id, estudiante_curso_id, estudiante_rut, estudiante_fecha_nacimiento)
-         VALUES (?, ?, ?, ?)`,
+                 VALUES (?, ?, ?, ?)`,
                 [nuevoUsuarioId, curso_id, rut, fecha_nacimiento || null]
             );
         }
 
         if (rolNombre === 'docente') {
             if (!curso_id || !asignatura_id) {
+                await conn.rollback();
+                conn.release();
                 return res.status(400).json({ mensaje: 'El curso y la asignatura son obligatorios para docentes.' });
             }
-            await db.query(
+            await conn.query(
                 `INSERT INTO docente_asignatura (docente_usuario_id, asignatura_id, curso_id)
-         VALUES (?, ?, ?)`,
+                 VALUES (?, ?, ?)`,
                 [nuevoUsuarioId, asignatura_id, curso_id]
             );
         }
 
+        // Todo salió bien, confirmamos la transacción
+        await conn.commit();
+        conn.release();
+
+        // Enviamos el correo solo si la transacción fue exitosa
         await enviarContrasenaTemp(email, nombre, contrasenaTemp);
+
         res.json({ mensaje: `Usuario creado exitosamente. Se envió la contraseña temporal a ${email}.` });
 
     } catch (error) {
+        await conn.rollback();
+        conn.release();
         res.status(500).json({ mensaje: 'Error al crear usuario.', error: error.message });
     }
 };
@@ -97,9 +122,10 @@ const editarUsuario = async (req, res) => {
 
     try {
         await db.query(
-            `UPDATE usuarios 
-       SET usuario_nombre = ?, usuario_segundo_nombre = ?, usuario_apellido = ?, usuario_segundo_apellido = ?, usuario_email = ?, usuario_rol_id = ?
-       WHERE usuario_id = ?`,
+            `UPDATE usuarios
+             SET usuario_nombre = ?, usuario_segundo_nombre = ?, usuario_apellido = ?,
+                 usuario_segundo_apellido = ?, usuario_email = ?, usuario_rol_id = ?
+             WHERE usuario_id = ?`,
             [nombre, segundo_nombre || null, apellido, segundo_apellido || null, email, rol_id, id]
         );
         res.json({ mensaje: 'Usuario actualizado correctamente.' });
@@ -109,12 +135,10 @@ const editarUsuario = async (req, res) => {
 };
 
 // Resetear contraseña de un usuario (solo administrador)
-// Genera una nueva contraseña temporal y la envía por correo
 const resetearContrasena = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Obtenemos los datos del usuario
         const [usuarios] = await db.query(
             'SELECT * FROM usuarios WHERE usuario_id = ?',
             [id]
@@ -126,17 +150,14 @@ const resetearContrasena = async (req, res) => {
 
         const usuario = usuarios[0];
 
-        // Generamos y encriptamos la nueva contraseña temporal
         const contrasenaTemp = generarContrasenaTemp();
         const hash = await bcrypt.hash(contrasenaTemp, 10);
 
-        // Actualizamos la contraseña en la BD
         await db.query(
             'UPDATE usuarios SET usuario_contrasena = ? WHERE usuario_id = ?',
             [hash, id]
         );
 
-        // Enviamos la nueva contraseña temporal por correo
         await enviarContrasenaTemp(usuario.usuario_email, usuario.usuario_nombre, contrasenaTemp);
 
         res.json({ mensaje: `Contraseña reseteada. Se envió la nueva contraseña temporal a ${usuario.usuario_email}.` });
@@ -160,7 +181,6 @@ const obtenerRoles = async (req, res) => {
 const toggleActivoUsuario = async (req, res) => {
     const { id } = req.params;
     try {
-        // Obtenemos el estado actual del usuario
         const [usuarios] = await db.query(
             'SELECT usuario_activo FROM usuarios WHERE usuario_id = ?',
             [id]
@@ -170,7 +190,6 @@ const toggleActivoUsuario = async (req, res) => {
             return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
         }
 
-        // Invertimos el estado activo/inactivo
         const nuevoEstado = usuarios[0].usuario_activo === 1 ? 0 : 1;
 
         await db.query(

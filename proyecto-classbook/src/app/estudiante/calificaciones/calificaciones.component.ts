@@ -1,5 +1,4 @@
-// Importamos las dependencias necesarias
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
@@ -14,20 +13,18 @@ import { FIRMA_DIRECTOR, TIMBRE_DIRECTOR } from '../../shared/images.constants';
   templateUrl: './calificaciones.component.html',
   styleUrl: './calificaciones.component.css'
 })
-export class CalificacionesComponent implements OnInit, AfterViewInit {
+export class CalificacionesComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  // Links y ruta base para el navbar compartido
   links = LINKS_ESTUDIANTE;
   rutaBase = '/estudiante';
 
-  // Datos de calificaciones
   asignaturas: any[] = [];
   promedioGeneral: number = 0;
   mostrarGrafico: boolean = false;
 
-  // Referencia al canvas del gráfico
   @ViewChild('graficoCanvas') graficoCanvas!: ElementRef;
   grafico: any = null;
+  private resizeObserver: ResizeObserver | null = null;
 
   private apiUrl = 'http://localhost:3000';
 
@@ -39,6 +36,12 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() { }
 
+  // Limpia el gráfico y el observer al destruir el componente
+  ngOnDestroy() {
+    if (this.resizeObserver) this.resizeObserver.disconnect();
+    if (this.grafico) this.grafico.destroy();
+  }
+
   private getHeaders() {
     const token = sessionStorage.getItem('token');
     return new HttpHeaders({ Authorization: `Bearer ${token}` });
@@ -49,40 +52,41 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
     return JSON.parse(atob(token!.split('.')[1])).id;
   }
 
-  // Carga las calificaciones del estudiante
   cargarCalificaciones() {
     const id = this.getUsuarioId();
     this.http.get<any>(`${this.apiUrl}/estudiante/${id}/calificaciones`, { headers: this.getHeaders() }).subscribe({
       next: (data) => {
         this.asignaturas = data.asignaturas;
         this.promedioGeneral = data.promedioGeneral;
-        // Renderizamos el gráfico después de cargar los datos
         setTimeout(() => this.renderizarGrafico(), 100);
       },
       error: (err) => console.error('Error al cargar calificaciones', err)
     });
   }
 
-  // Renderiza el gráfico de barras con Chart.js
   renderizarGrafico() {
     if (!this.graficoCanvas || !this.mostrarGrafico) return;
 
+    // Destruir gráfico anterior si existe
     if (this.grafico) {
       this.grafico.destroy();
+      this.grafico = null;
     }
+
+    const canvas = this.graficoCanvas.nativeElement;
+    const wrapper = canvas.parentElement;
 
     const labels = this.asignaturas.map(a => a.asignatura_nombre);
     const promedios = this.asignaturas.map(a => parseFloat(a.promedio) || 0);
 
-    // Coloreamos cada barra según el rango de la nota
     const colores = promedios.map(p => {
-      if (p >= 6.0) return '#16a34a'; // Verde - Excelente
-      if (p >= 5.0) return '#1a73e8'; // Azul - Bueno
-      if (p >= 4.0) return '#e37400'; // Naranja - Suficiente
-      return '#d93025';               // Rojo - Insuficiente
+      if (p >= 6.0) return '#16a34a';
+      if (p >= 5.0) return '#1a73e8';
+      if (p >= 4.0) return '#e37400';
+      return '#d93025';
     });
 
-    this.grafico = new Chart(this.graficoCanvas.nativeElement, {
+    this.grafico = new Chart(canvas, {
       type: 'bar',
       data: {
         labels,
@@ -95,9 +99,10 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         scales: {
           y: {
-            min: 1,
+            min: 2,
             max: 7,
             ticks: { stepSize: 0.5 }
           }
@@ -107,26 +112,42 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
         }
       }
     });
+
+    // ResizeObserver para que el gráfico sea responsivo
+    if (this.resizeObserver) this.resizeObserver.disconnect();
+    this.resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        if (this.grafico) {
+          canvas.style.width = entry.contentRect.width + 'px';
+          canvas.style.height = entry.contentRect.height + 'px';
+          this.grafico.resize();
+        }
+      }
+    });
+    this.resizeObserver.observe(wrapper);
   }
 
-  // Muestra u oculta el gráfico
   toggleGrafico() {
     this.mostrarGrafico = !this.mostrarGrafico;
     if (this.mostrarGrafico) {
       setTimeout(() => this.renderizarGrafico(), 100);
-    } else if (this.grafico) {
-      this.grafico.destroy();
-      this.grafico = null;
+    } else {
+      if (this.resizeObserver) {
+        this.resizeObserver.disconnect();
+        this.resizeObserver = null;
+      }
+      if (this.grafico) {
+        this.grafico.destroy();
+        this.grafico = null;
+      }
     }
   }
 
-  // Obtiene la nota de una asignatura para un tipo y número específico
   getNota(calificaciones: any[], tipo: string, numero: number): string {
     const cal = calificaciones.find(c => c.calificacion_tipo === tipo && c.calificacion_numero === numero);
     return cal ? cal.calificacion_nota : '-';
   }
 
-  // Retorna la clase CSS según el rango de la nota
   getClaseNota(nota: any): string {
     const n = parseFloat(nota);
     if (isNaN(n)) return '';
@@ -136,7 +157,6 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
     return 'nota-insuficiente';
   }
 
-  // Descarga el certificado PDF con jsPDF
   descargarPDF() {
     import('jspdf').then(({ jsPDF }) => {
       const doc = new jsPDF();
@@ -151,12 +171,10 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
       const pageHeight = doc.internal.pageSize.getHeight();
       const centerX = pageWidth / 2;
 
-      // Construir nombre completo sin espacios dobles
       const nombreCompleto = [nombre, segundoNombre, apellido, segundoApellido]
         .filter(v => v.trim() !== '')
         .join(' ');
 
-      // ─── CABECERA ────────────────────────────────────────────────
       doc.setFillColor(23, 45, 68);
       doc.rect(0, 0, pageWidth, 38, 'F');
 
@@ -169,7 +187,6 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
       doc.setFont('helvetica', 'normal');
       doc.text('Certificado De Concentración De Notas — Año Escolar ' + anio, centerX, 22, { align: 'center' });
 
-      // ─── DATOS DEL ESTUDIANTE ────────────────────────────────────
       doc.setTextColor(0, 0, 0);
       doc.setFillColor(240, 244, 255);
       doc.rect(14, 44, pageWidth - 28, 32, 'F');
@@ -203,10 +220,8 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
       doc.setFontSize(11);
       doc.text(`${this.promedioGeneral}`, 162, 68);
 
-      // ─── TABLA DE CALIFICACIONES ─────────────────────────────────
       let y = 88;
 
-      // Encabezado de tabla
       doc.setFillColor(23, 45, 68);
       doc.rect(14, y - 6, pageWidth - 28, 10, 'F');
       doc.setTextColor(255, 255, 255);
@@ -224,16 +239,13 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(9);
 
-      // Filas de asignaturas
       this.asignaturas.forEach((asig, index) => {
-        // Fila alternada
         if (index % 2 === 0) {
           doc.setFillColor(248, 249, 255);
           doc.rect(14, y - 5, pageWidth - 28, 9, 'F');
         }
 
         const promedio = parseFloat(asig.promedio);
-        // Colorear promedio si es reprobado (< 4.0)
         if (!isNaN(promedio) && promedio < 4.0) {
           doc.setTextColor(180, 0, 0);
         } else {
@@ -249,13 +261,11 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
         doc.text(this.getNota(asig.calificaciones, 'actividad', 1).toString(), 150, y, { align: 'center' });
         doc.text(this.getNota(asig.calificaciones, 'examen', 1).toString(), 165, y, { align: 'center' });
 
-        // Promedio en negrita
         doc.setFont('helvetica', 'bold');
         if (!isNaN(promedio) && promedio < 4.0) doc.setTextColor(180, 0, 0);
         doc.text(asig.promedio?.toString() || '-', 185, y, { align: 'center' });
         doc.setTextColor(0, 0, 0);
 
-        // Línea separadora de fila
         doc.setDrawColor(200, 200, 200);
         doc.setLineWidth(0.1);
         doc.line(14, y + 4, 196, y + 4);
@@ -263,12 +273,10 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
         y += 10;
       });
 
-      // Borde exterior de la tabla
       doc.setDrawColor(20, 40, 100);
       doc.setLineWidth(0.3);
       doc.rect(14, 82, pageWidth - 28, y - 82, 'S');
 
-      // ─── NOTA AL PIE DE TABLA ────────────────────────────────────
       y += 4;
       doc.setFontSize(8);
       doc.setFont('helvetica', 'italic');
@@ -278,14 +286,12 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
       doc.text('* EXAM. = Examen  |  Escala de evaluación: 2.0 a 7.0', 14, y + 10);
       doc.text('* P1, P2, P3 = Pruebas  |  Escala de evaluación: 2.0 a 7.0', 14, y + 15);
 
-      // ─── SECCIÓN DE FIRMAS ───────────────────────────────────────
       const firmasY = pageHeight - 50;
 
       doc.setTextColor(0, 0, 0);
       doc.setLineWidth(0.3);
       doc.setDrawColor(0, 0, 0);
-      
-      // Firma del director
+
       doc.addImage(FIRMA_DIRECTOR, 'PNG', centerX - 30, firmasY - 28, 60, 22);
 
       doc.setLineWidth(0.3);
@@ -300,21 +306,18 @@ export class CalificacionesComponent implements OnInit, AfterViewInit {
       doc.setFontSize(7);
       doc.text('DIRECTOR COLEGIO CRUZ DEL SUR ', centerX, firmasY + 11, { align: 'center' });
 
-      // Timbre del director
       doc.addImage(TIMBRE_DIRECTOR, 'PNG', centerX + 5, firmasY - 45, 45, 45);
 
-      // ─── PIE DE PÁGINA ───────────────────────────────────────────
       doc.setFillColor(23, 45, 68);
       doc.rect(0, pageHeight - 14, pageWidth, 14, 'F');
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
       doc.text(
-        `Colegio Cruz del Sur  •  Documento generado en plataforma ClassBook  y de uso interno del establecimiento, el ${fecha}  •  Año Escolar ${anio}`,
+        `Colegio Cruz del Sur  •  Documento generado en plataforma ClassBook y de uso interno del establecimiento el ${fecha}  •  Año Escolar ${anio}`,
         centerX, pageHeight - 6, { align: 'center' }
       );
 
-      // ─── GUARDAR ─────────────────────────────────────────────────
       doc.save(`Certificado_Concentracion_Notas_${nombreCompleto}.pdf`);
     });
   }

@@ -14,11 +14,9 @@ import { LINKS_ADMINISTRADOR } from '../../shared/navbar.links';
 })
 export class DashboardComponent implements OnInit {
 
-  // Links del navbar del administrador
   links = LINKS_ADMINISTRADOR;
   rutaBase = '/administrador';
 
-  // Variables para las tarjetas de resumen
   totalUsuarios: number = 0;
   totalCursos: number = 0;
   totalAsignaturas: number = 0;
@@ -59,12 +57,19 @@ export class DashboardComponent implements OnInit {
       error: (err) => console.error('Error al cargar asignaturas', err)
     });
 
-    this.http.get<any[]>(`${this.apiUrl}/historial`, { headers: this.getHeaders() }).subscribe({
+    // Solo pedimos los últimos 5 registros para la actividad reciente
+    // evitando traer toda la tabla historial solo para mostrar 5 filas
+    this.http.get<any[]>(`${this.apiUrl}/historial?limit=5`, { headers: this.getHeaders() }).subscribe({
       next: (data) => {
-        this.totalHistorial = data.length;
-        this.actividadReciente = data.slice(0, 5);
+        this.actividadReciente = data;
       },
       error: (err) => console.error('Error al cargar historial', err)
+    });
+
+    // Para el total del historial usamos un endpoint de conteo separado
+    this.http.get<any>(`${this.apiUrl}/historial/total`, { headers: this.getHeaders() }).subscribe({
+      next: (data) => this.totalHistorial = data.total,
+      error: (err) => console.error('Error al cargar total historial', err)
     });
 
     this.http.get<any>(`${this.apiUrl}/estado`).subscribe({
@@ -77,7 +82,6 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  // Métodos para el historial
   getTitulo(detalle: string): string {
     return detalle?.includes('|') ? detalle.split('|')[0] : detalle;
   }

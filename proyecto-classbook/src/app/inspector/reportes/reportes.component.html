@@ -1,0 +1,87 @@
+<div class="layout">
+
+    <app-navbar [links]="links" [rutaBase]="rutaBase"></app-navbar>
+
+    <main class="contenido">
+
+        <h1 class="titulo">Reportes de Rendimiento</h1>
+        <p class="subtitulo">Análisis de promedios generales por asignatura y curso</p>
+
+        <!-- Filtros -->
+        <div class="filtros-card">
+            <h3 class="filtros-titulo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                Filtros
+            </h3>
+            <div class="filtros-grid">
+                <div class="campo">
+                    <label>Curso</label>
+                    <select [(ngModel)]="cursoSeleccionado" (change)="cargarReportes()">
+                        <option value="">Todos los cursos</option>
+                        <option *ngFor="let c of cursos" [value]="c.curso_id">{{ c.curso_nombre }}</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label>Asignatura</label>
+                    <select [(ngModel)]="asignaturaSeleccionada" (change)="cargarReportes()">
+                        <option value="">Todas las asignaturas</option>
+                        <option *ngFor="let a of asignaturas" [value]="a.asignatura_id">{{ a.asignatura_nombre }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Buscador de estudiante -->
+            <div class="campo">
+                <label>Buscar estudiante</label>
+                <div class="buscador-container">
+                    <input type="text" [(ngModel)]="busquedaEstudiante" (input)="buscarEstudiante()"
+                        placeholder="Ej: Pedro López" [disabled]="!!estudianteSeleccionado" />
+                    <button class="btn-limpiar-est" *ngIf="estudianteSeleccionado"
+                        (click)="limpiarEstudiante()">✗</button>
+                    <div class="sugerencias" *ngIf="mostrarSugerencias && estudiantesResultado.length > 0">
+                        <div class="sugerencia-item" *ngFor="let est of estudiantesResultado"
+                            (click)="seleccionarEstudiante(est)">
+                            {{ est.usuario_nombre }} {{ est.usuario_segundo_nombre || '' }}
+                            {{ est.usuario_apellido }} {{ est.usuario_segundo_apellido || '' }} - {{ est.curso_nombre }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta promedio general -->
+        <div class="tarjeta-promedio" [style.background]="getColorPromedio()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                <polyline points="16 7 22 7 22 13" />
+            </svg>
+            <div>
+                <p class="promedio-label">
+                    {{ estudianteSeleccionado ? 'Promedio del Estudiante' : 'Promedio General del Establecimiento' }}
+                </p>
+                <h2 class="promedio-numero">{{ promedioGeneral || '-' }}</h2>
+            </div>
+        </div>
+
+        <!-- Gráfico -->
+        <div class="grafico-card" *ngIf="promediosPorAsignatura.length > 0 || notasEstudiante.length > 0">
+            <h3 class="card-titulo">
+                {{ estudianteSeleccionado ? 'Rendimiento del Estudiante por Asignatura' : 'Promedios por Asignatura' }}
+            </h3>
+            <div class="grafico-wrapper">
+                <canvas #graficoCanvas></canvas>
+            </div>
+        </div>
+
+        <!-- Sin datos -->
+        <div class="sin-datos" *ngIf="promediosPorAsignatura.length === 0 && notasEstudiante.length === 0">
+            No hay calificaciones registradas con los filtros seleccionados.
+        </div>
+
+    </main>
+</div>

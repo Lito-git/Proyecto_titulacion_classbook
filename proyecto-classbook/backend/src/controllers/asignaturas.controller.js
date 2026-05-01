@@ -42,10 +42,32 @@ const editarAsignatura = async (req, res) => {
     }
 };
 
-// Eliminar una asignatura
+// Eliminar una asignatura — verifica dependencias antes de borrar
 const eliminarAsignatura = async (req, res) => {
     const { id } = req.params;
     try {
+        // Verificamos si hay calificaciones asociadas
+        const [enCalificaciones] = await db.query(
+            'SELECT COUNT(*) AS total FROM calificaciones WHERE calificacion_asignatura_id = ?',
+            [id]
+        );
+        if (enCalificaciones[0].total > 0) {
+            return res.status(400).json({
+                mensaje: 'No se puede eliminar: la asignatura tiene calificaciones registradas.'
+            });
+        }
+
+        // Verificamos si hay docentes asignados
+        const [enDocentes] = await db.query(
+            'SELECT COUNT(*) AS total FROM docente_asignatura WHERE asignatura_id = ?',
+            [id]
+        );
+        if (enDocentes[0].total > 0) {
+            return res.status(400).json({
+                mensaje: 'No se puede eliminar: la asignatura tiene docentes asignados.'
+            });
+        }
+
         await db.query('DELETE FROM asignaturas WHERE asignatura_id = ?', [id]);
         res.json({ mensaje: 'Asignatura eliminada correctamente.' });
     } catch (error) {

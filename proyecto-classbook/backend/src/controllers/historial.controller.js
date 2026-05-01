@@ -1,26 +1,36 @@
 // Importamos la conexión a la base de datos
 const db = require('../config/db');
 
-// Obtener todos los registros del historial de cambios
-// con filtros opcionales por tipo de cambio, usuario y rango de fechas
+// Obtener el total de registros del historial (para el dashboard del admin)
+const obtenerTotalHistorial = async (req, res) => {
+    try {
+        const [resultado] = await db.query(
+            'SELECT COUNT(*) AS total FROM historial_cambios'
+        );
+        res.json({ total: resultado[0].total });
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error al obtener total del historial.', error: error.message });
+    }
+};
+
+// Obtener registros del historial con filtros opcionales
+// Soporta parámetro limit para el dashboard (evita traer toda la tabla)
 const obtenerHistorial = async (req, res) => {
-    const { tipo, usuario_id, fecha_inicio, fecha_fin } = req.query;
+    const { tipo, usuario_id, fecha_inicio, fecha_fin, limit } = req.query;
 
     try {
-        // Construimos la consulta base con JOIN para obtener el nombre completo del usuario
         let query = `
-      SELECT h.*,
-        u.usuario_nombre,
-        u.usuario_segundo_nombre,
-        u.usuario_apellido,
-        u.usuario_segundo_apellido
-      FROM historial_cambios h
-      JOIN usuarios u ON h.historial_usuario_id = u.usuario_id
-      WHERE 1=1
-    `;
+            SELECT h.*,
+                u.usuario_nombre,
+                u.usuario_segundo_nombre,
+                u.usuario_apellido,
+                u.usuario_segundo_apellido
+            FROM historial_cambios h
+            JOIN usuarios u ON h.historial_usuario_id = u.usuario_id
+            WHERE 1=1
+        `;
         const params = [];
 
-        // Agregamos filtros dinámicamente según los parámetros recibidos
         if (tipo) {
             query += ' AND h.historial_tipo_cambio = ?';
             params.push(tipo);
@@ -40,6 +50,12 @@ const obtenerHistorial = async (req, res) => {
 
         query += ' ORDER BY h.historial_fecha_cambio DESC';
 
+        // Soporte para limit — usado por el dashboard para no traer toda la tabla
+        if (limit && !isNaN(parseInt(limit))) {
+            query += ` LIMIT ?`;
+            params.push(parseInt(limit));
+        }
+
         const [historial] = await db.query(query, params);
         res.json(historial);
     } catch (error) {
@@ -47,4 +63,4 @@ const obtenerHistorial = async (req, res) => {
     }
 };
 
-module.exports = { obtenerHistorial };
+module.exports = { obtenerHistorial, obtenerTotalHistorial };
