@@ -275,6 +275,11 @@ const registrarAnotacion = async (req, res) => {
     const { estudiante_id, tipo, descripcion } = req.body;
     const profesor_id = req.usuario.id;
 
+    // Validar que la descripción no esté vacía
+    if (!descripcion || !descripcion.trim()) {
+        return res.status(400).json({ mensaje: 'La descripción de la anotación es obligatoria.' });
+    }
+
     const conn = await db.getConnection();
     try {
         await conn.beginTransaction();

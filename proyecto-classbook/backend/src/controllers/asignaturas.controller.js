@@ -42,11 +42,11 @@ const editarAsignatura = async (req, res) => {
     }
 };
 
-// Eliminar una asignatura — verifica dependencias antes de borrar
+// Eliminar una asignatura — verifica que no tenga usuarios ACTIVOS ni calificaciones
 const eliminarAsignatura = async (req, res) => {
     const { id } = req.params;
     try {
-        // Verificamos si hay calificaciones asociadas
+        // Verificamos si hay calificaciones registradas para esta asignatura
         const [enCalificaciones] = await db.query(
             'SELECT COUNT(*) AS total FROM calificaciones WHERE calificacion_asignatura_id = ?',
             [id]
@@ -57,14 +57,17 @@ const eliminarAsignatura = async (req, res) => {
             });
         }
 
-        // Verificamos si hay docentes asignados
+        // Verificamos si hay docentes ACTIVOS asignados a esta asignatura
         const [enDocentes] = await db.query(
-            'SELECT COUNT(*) AS total FROM docente_asignatura WHERE asignatura_id = ?',
+            `SELECT COUNT(*) AS total 
+             FROM docente_asignatura da
+             JOIN usuarios u ON u.usuario_id = da.docente_usuario_id
+             WHERE da.asignatura_id = ? AND u.usuario_activo = 1`,
             [id]
         );
         if (enDocentes[0].total > 0) {
             return res.status(400).json({
-                mensaje: 'No se puede eliminar: la asignatura tiene docentes asignados.'
+                mensaje: 'No se puede eliminar: la asignatura tiene docentes activos. Desactívalos primero desde Gestión de Usuarios.'
             });
         }
 

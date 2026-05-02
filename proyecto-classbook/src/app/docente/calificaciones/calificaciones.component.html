@@ -223,7 +223,11 @@
                             </td>
 
                             <!-- Promedio -->
-                            <td class="promedio">{{ getPromedio(est.calificaciones) }}</td>
+                            <td>
+                                <span class="badge-nota" [ngClass]="getClaseNota(getPromedio(est.calificaciones))">
+                                    {{ getPromedio(est.calificaciones) }}
+                                </span>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

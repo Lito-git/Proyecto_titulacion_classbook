@@ -27,22 +27,6 @@
     margin-bottom: 24px;
 }
 
-/* Card de selectores */
-.selectores-card {
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 24px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-    margin-bottom: 24px;
-}
-
-.selectores-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
 /* Campos */
 .campo {
     display: flex;
@@ -69,49 +53,6 @@
 .campo select:focus,
 .campo input:focus {
     border-color: #16a34a;
-}
-
-/* Botones */
-.botones {
-    display: flex;
-    gap: 12px;
-}
-
-.btn-consultar {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 20px;
-    background-color: #f5f5f5;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-    color: #333;
-    transition: background-color 0.2s;
-}
-
-.btn-consultar:hover {
-    background-color: #e8e8e8;
-}
-
-.btn-registrar {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 20px;
-    background-color: #16a34a;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.btn-registrar:hover {
-    background-color: #15803d;
 }
 
 /* Card formulario */
@@ -203,12 +144,6 @@
 
 .tabla tbody tr:last-child td {
     border-bottom: none;
-}
-
-/* Promedio */
-.promedio {
-    font-weight: 700;
-    color: #0d2d5e;
 }
 
 /* Botón editar nota */
@@ -354,6 +289,35 @@
     border-color: #16a34a;
 }
 
+/* Badge base */
+.badge-nota {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Colores */
+.badge-nota.nota-excelente {
+    background-color: #e6f4ea;
+    color: #16a34a;
+}
+
+.badge-nota.nota-bueno {
+    background-color: #e8f0fe;
+    color: #1a73e8;
+}
+
+.badge-nota.nota-suficiente {
+    background-color: #fff3e0;
+    color: #e37400;
+}
+
+.badge-nota.nota-insuficiente {
+    background-color: #fce8e6;
+    color: #d93025;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .contenido {
@@ -365,11 +329,9 @@
         grid-template-columns: 1fr;
     }
 
-    
     .buscador-container {
         width: 100%;
     }
-
 
     .tabla-container {
         overflow-x: auto;

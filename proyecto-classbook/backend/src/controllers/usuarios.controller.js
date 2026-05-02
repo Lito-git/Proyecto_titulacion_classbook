@@ -205,4 +205,112 @@ const toggleActivoUsuario = async (req, res) => {
     }
 };
 
-module.exports = { obtenerUsuarios, crearUsuario, editarUsuario, resetearContrasena, obtenerRoles, toggleActivoUsuario };
+// Eliminar físicamente un usuario y todos sus datos asociados en cascada
+// Solo disponible para el Administrador bajo circunstancias justificadas
+const eliminarUsuario = async (req, res) => {
+    const { id } = req.params;
+    const conn = await db.getConnection();
+
+    try {
+        // Verificamos que el usuario existe
+        const [usuarios] = await conn.query(
+            'SELECT u.*, r.rol_nombre FROM usuarios u JOIN roles r ON r.rol_id = u.usuario_rol_id WHERE u.usuario_id = ?',
+            [id]
+        );
+
+        if (usuarios.length === 0) {
+            conn.release();
+            return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
+        }
+
+        const usuario = usuarios[0];
+
+        // No permitir eliminar la propia cuenta del administrador autenticado
+        if (parseInt(id) === req.usuario.id) {
+            conn.release();
+            return res.status(400).json({ mensaje: 'No puedes eliminar tu propia cuenta.' });
+        }
+
+        await conn.beginTransaction();
+
+        if (usuario.rol_nombre === 'estudiante') {
+            // Obtenemos el estudiante_id
+            const [estudiante] = await conn.query(
+                'SELECT estudiante_id FROM estudiantes WHERE estudiante_usuario_id = ?', [id]
+            );
+
+            if (estudiante.length > 0) {
+                const estudianteId = estudiante[0].estudiante_id;
+
+                // Eliminamos historial relacionado con calificaciones del estudiante
+                await conn.query(
+                    `DELETE FROM historial_cambios WHERE historial_registro_id IN (
+                        SELECT calificacion_id FROM calificaciones WHERE calificacion_estudiante_id = ?
+                    ) AND historial_tabla_afectada = 'calificaciones'`,
+                    [estudianteId]
+                );
+
+                // Eliminamos historial relacionado con anotaciones del estudiante
+                await conn.query(
+                    `DELETE FROM historial_cambios WHERE historial_registro_id IN (
+                        SELECT anotacion_id FROM anotaciones WHERE anotacion_estudiante_id = ?
+                    ) AND historial_tabla_afectada = 'anotaciones'`,
+                    [estudianteId]
+                );
+
+                // Eliminamos calificaciones del estudiante
+                await conn.query(
+                    'DELETE FROM calificaciones WHERE calificacion_estudiante_id = ?', [estudianteId]
+                );
+
+                // Eliminamos anotaciones del estudiante
+                await conn.query(
+                    'DELETE FROM anotaciones WHERE anotacion_estudiante_id = ?', [estudianteId]
+                );
+
+                // Eliminamos registro en estudiantes
+                await conn.query(
+                    'DELETE FROM estudiantes WHERE estudiante_id = ?', [estudianteId]
+                );
+            }
+        }
+
+        if (usuario.rol_nombre === 'docente') {
+            // Eliminamos historial de acciones del docente
+            await conn.query(
+                'DELETE FROM historial_cambios WHERE historial_usuario_id = ?', [id]
+            );
+
+            // Eliminamos calificaciones registradas por el docente
+            await conn.query(
+                'DELETE FROM calificaciones WHERE calificacion_profesor_id = ?', [id]
+            );
+
+            // Eliminamos anotaciones registradas por el docente
+            await conn.query(
+                'DELETE FROM anotaciones WHERE anotacion_profesor_id = ?', [id]
+            );
+
+            // Eliminamos asignaciones del docente
+            await conn.query(
+                'DELETE FROM docente_asignatura WHERE docente_usuario_id = ?', [id]
+            );
+        }
+
+        // Finalmente eliminamos el usuario
+        // Para inspector y administrador no hay datos adicionales que limpiar
+        await conn.query('DELETE FROM usuarios WHERE usuario_id = ?', [id]);
+
+        await conn.commit();
+        conn.release();
+
+        res.json({ mensaje: `Usuario ${usuario.usuario_nombre} ${usuario.usuario_apellido} eliminado correctamente junto con todos sus datos asociados.` });
+
+    } catch (error) {
+        await conn.rollback();
+        conn.release();
+        res.status(500).json({ mensaje: 'Error al eliminar usuario.', error: error.message });
+    }
+};
+
+module.exports = { obtenerUsuarios, crearUsuario, editarUsuario, resetearContrasena, obtenerRoles, toggleActivoUsuario, eliminarUsuario };

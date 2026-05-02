@@ -24,7 +24,15 @@ export class LoginComponent {
 
   iniciarSesion() {
     this.mensajeError = '';
+
+    // Validar que los campos no estén vacíos antes de enviar
+    if (!this.email.trim() || !this.contrasena.trim()) {
+      this.mensajeError = 'Por favor ingresa tu correo y contraseña.';
+      return;
+    }
+
     this.cargando = true;
+    
     this.authService.login(this.email, this.contrasena).subscribe({
       next: (respuesta: any) => {
         this.authService.guardarSesion(
@@ -37,8 +45,10 @@ export class LoginComponent {
           respuesta.segundo_nombre,
           respuesta.segundo_apellido
         );
-        this.router.navigate([`/${respuesta.rol}`]);
-        this.cargando = false;
+        this.router.navigate([`/${respuesta.rol}`])
+          .finally(() => {
+            this.cargando = false;
+          });
       },
       error: (err) => {
         this.mensajeError = err.error?.mensaje || 'Error al iniciar sesión.';

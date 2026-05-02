@@ -70,6 +70,13 @@ export class CursosComponent implements OnInit {
   guardarCurso() {
     this.mensajeExito = '';
     this.mensajeError = '';
+
+    // Validamos que los campos obligatorios no estén vacíos
+    if (!this.formulario.nombre.trim() || !this.formulario.nivel.trim()) {
+      this.mensajeError = 'El nombre y el nivel del curso son obligatorios.';
+      return;
+    }
+
     this.cargando = true;
 
     if (this.modoEdicion) {

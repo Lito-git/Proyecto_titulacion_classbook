@@ -28,6 +28,12 @@ export class RecuperarContrasenaComponent {
   recuperarContrasena() {
     this.mensajeExito = '';
     this.mensajeError = '';
+
+    if(!this.email.trim()) {
+      this.mensajeError = 'Por favor, ingresa tu correo electrónico.';
+      return;
+    }
+
     this.cargando = true;
 
     this.http.post(`${this.apiUrl}/auth/recuperar-contrasena`, { email: this.email }).subscribe({

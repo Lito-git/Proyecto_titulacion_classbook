@@ -30,6 +30,10 @@ export class UsuariosComponent implements OnInit {
   mostrarModal: boolean = false;
   modoEdicion: boolean = false;
 
+  // Variables para el modal de confirmación de eliminación física
+  mostrarModalEliminar: boolean = false;
+  usuarioAEliminar: any = null;
+
   formulario = {
     id: 0,
     nombre: '',
@@ -104,18 +108,8 @@ export class UsuariosComponent implements OnInit {
   abrirModalCrear() {
     this.modoEdicion = false;
     this.formulario = {
-      id: 0,
-      nombre: '',
-      segundo_nombre: '',
-      apellido: '',
-      segundo_apellido: '',
-      email: '',
-      rol_id: 0,
-      rol_nombre: '',
-      rut: '',
-      fecha_nacimiento: '',
-      curso_id: 0,
-      asignatura_id: 0
+      id: 0, nombre: '', segundo_nombre: '', apellido: '', segundo_apellido: '',
+      email: '', rol_id: 0, rol_nombre: '', rut: '', fecha_nacimiento: '', curso_id: 0, asignatura_id: 0
     };
     this.mensajeExito = '';
     this.mensajeError = '';
@@ -133,10 +127,7 @@ export class UsuariosComponent implements OnInit {
       email: usuario.usuario_email,
       rol_id: usuario.usuario_rol_id,
       rol_nombre: usuario.rol_nombre,
-      rut: '',
-      fecha_nacimiento: '',
-      curso_id: 0,
-      asignatura_id: 0
+      rut: '', fecha_nacimiento: '', curso_id: 0, asignatura_id: 0
     };
     this.mensajeExito = '';
     this.mensajeError = '';
@@ -147,6 +138,33 @@ export class UsuariosComponent implements OnInit {
     this.mostrarModal = false;
     this.mensajeExito = '';
     this.mensajeError = '';
+  }
+
+  // Abre el modal de confirmación de eliminación física
+  abrirModalEliminar(usuario: any) {
+    this.usuarioAEliminar = usuario;
+    this.mostrarModalEliminar = true;
+  }
+
+  // Cierra el modal de confirmación de eliminación
+  cerrarModalEliminar() {
+    this.mostrarModalEliminar = false;
+    this.usuarioAEliminar = null;
+  }
+
+  // Elimina físicamente el usuario y todos sus datos asociados en cascada
+  eliminarUsuario() {
+    if (!this.usuarioAEliminar) return;
+    this.http.delete(`${this.apiUrl}/usuarios/${this.usuarioAEliminar.usuario_id}`, { headers: this.getHeaders() }).subscribe({
+      next: (res: any) => {
+        this.cerrarModalEliminar();
+        this.cargarUsuarios();
+      },
+      error: (err) => {
+        alert(err.error?.mensaje || 'Error al eliminar usuario.');
+        this.cerrarModalEliminar();
+      }
+    });
   }
 
   guardarUsuario() {
@@ -179,7 +197,8 @@ export class UsuariosComponent implements OnInit {
     if (this.modoEdicion) {
       this.http.put(`${this.apiUrl}/usuarios/${this.formulario.id}`,
         {
-          nombre: this.formulario.nombre, segundo_nombre: this.formulario.segundo_nombre, apellido: this.formulario.apellido, segundo_apellido: this.formulario.segundo_apellido,
+          nombre: this.formulario.nombre, segundo_nombre: this.formulario.segundo_nombre,
+          apellido: this.formulario.apellido, segundo_apellido: this.formulario.segundo_apellido,
           email: this.formulario.email, rol_id: this.formulario.rol_id
         }, { headers: this.getHeaders() }
       ).subscribe({
@@ -188,16 +207,11 @@ export class UsuariosComponent implements OnInit {
       });
     } else {
       const body: any = {
-        nombre: this.formulario.nombre,
-        segundo_nombre: this.formulario.segundo_nombre,
-        apellido: this.formulario.apellido,
-        segundo_apellido: this.formulario.segundo_apellido,
-        email: this.formulario.email,
-        rol_id: this.formulario.rol_id,
-        rut: this.formulario.rut,
-        fecha_nacimiento: this.formulario.fecha_nacimiento,
-        curso_id: this.formulario.curso_id,
-        asignatura_id: this.formulario.asignatura_id
+        nombre: this.formulario.nombre, segundo_nombre: this.formulario.segundo_nombre,
+        apellido: this.formulario.apellido, segundo_apellido: this.formulario.segundo_apellido,
+        email: this.formulario.email, rol_id: this.formulario.rol_id,
+        rut: this.formulario.rut, fecha_nacimiento: this.formulario.fecha_nacimiento,
+        curso_id: this.formulario.curso_id, asignatura_id: this.formulario.asignatura_id
       };
       this.http.post(`${this.apiUrl}/usuarios`, body, { headers: this.getHeaders() }).subscribe({
         next: (res: any) => { this.mensajeExito = res.mensaje; this.cargarUsuarios(); this.cargando = false; },

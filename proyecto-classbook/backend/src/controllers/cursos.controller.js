@@ -48,29 +48,35 @@ const editarCurso = async (req, res) => {
     }
 };
 
-// Eliminar un curso — verifica dependencias antes de borrar
+// Eliminar un curso — verifica que no tenga usuarios ACTIVOS asociados
 const eliminarCurso = async (req, res) => {
     const { id } = req.params;
     try {
-        // Verificamos si hay estudiantes matriculados en el curso
+        // Verificamos si hay estudiantes con usuario activo matriculados en el curso
         const [conEstudiantes] = await db.query(
-            'SELECT COUNT(*) AS total FROM estudiantes WHERE estudiante_curso_id = ?',
+            `SELECT COUNT(*) AS total 
+             FROM estudiantes e
+             JOIN usuarios u ON u.usuario_id = e.estudiante_usuario_id
+             WHERE e.estudiante_curso_id = ? AND u.usuario_activo = 1`,
             [id]
         );
         if (conEstudiantes[0].total > 0) {
             return res.status(400).json({
-                mensaje: 'No se puede eliminar: el curso tiene estudiantes matriculados.'
+                mensaje: 'No se puede eliminar: el curso tiene estudiantes activos. Desactívalos primero desde Gestión de Usuarios.'
             });
         }
 
-        // Verificamos si hay docentes asignados al curso
+        // Verificamos si hay docentes con usuario activo asignados al curso
         const [conDocentes] = await db.query(
-            'SELECT COUNT(*) AS total FROM docente_asignatura WHERE curso_id = ?',
+            `SELECT COUNT(*) AS total 
+             FROM docente_asignatura da
+             JOIN usuarios u ON u.usuario_id = da.docente_usuario_id
+             WHERE da.curso_id = ? AND u.usuario_activo = 1`,
             [id]
         );
         if (conDocentes[0].total > 0) {
             return res.status(400).json({
-                mensaje: 'No se puede eliminar: el curso tiene docentes asignados.'
+                mensaje: 'No se puede eliminar: el curso tiene docentes activos. Desactívalos primero desde Gestión de Usuarios.'
             });
         }
 

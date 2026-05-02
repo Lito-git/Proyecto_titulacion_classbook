@@ -122,20 +122,42 @@ const obtenerReportes = async (req, res) => {
         if (estudiante_id) { queryPromedio += ' AND calificacion_estudiante_id = ?'; paramsPromedio.push(estudiante_id); }
         const [promedioGeneral] = await db.query(queryPromedio, paramsPromedio);
 
-        // Promedios por asignatura — ahora también filtra por asignatura_id
-        let queryAsignaturas = `
-      SELECT 
-        a.asignatura_id,
-        a.asignatura_nombre,
-        ROUND(AVG(cal.calificacion_nota), 1) AS promedio
-      FROM calificaciones cal
-      JOIN asignaturas a ON a.asignatura_id = cal.calificacion_asignatura_id
-      WHERE 1=1
-    `;
+        // Si hay asignatura seleccionada pero no curso → mostrar promedio por CURSO de esa asignatura
+        // Si hay curso seleccionado → mostrar promedio por ASIGNATURA de ese curso
+        // Si no hay ninguno → mostrar promedio por ASIGNATURA de todo el establecimiento
+        let queryAsignaturas;
         const paramsAsig = [];
-        if (curso_id) { queryAsignaturas += ' AND cal.calificacion_curso_id = ?'; paramsAsig.push(curso_id); }
-        if (asignatura_id) { queryAsignaturas += ' AND cal.calificacion_asignatura_id = ?'; paramsAsig.push(asignatura_id); }
-        queryAsignaturas += ' GROUP BY a.asignatura_id ORDER BY a.asignatura_nombre ASC';
+
+        if (asignatura_id && !curso_id) {
+            // Todos los cursos + asignatura específica → agrupa por curso
+            queryAsignaturas = `
+        SELECT 
+            c.curso_id AS asignatura_id,
+            c.curso_nombre AS asignatura_nombre,
+            ROUND(AVG(cal.calificacion_nota), 1) AS promedio
+        FROM calificaciones cal
+        JOIN cursos c ON c.curso_id = cal.calificacion_curso_id
+        WHERE cal.calificacion_asignatura_id = ?
+        GROUP BY c.curso_id
+        ORDER BY c.curso_nombre ASC
+    `;
+            paramsAsig.push(asignatura_id);
+        } else {
+            // Todos los demás casos → agrupa por asignatura
+            queryAsignaturas = `
+        SELECT 
+            a.asignatura_id,
+            a.asignatura_nombre,
+            ROUND(AVG(cal.calificacion_nota), 1) AS promedio
+        FROM calificaciones cal
+        JOIN asignaturas a ON a.asignatura_id = cal.calificacion_asignatura_id
+        WHERE 1=1
+    `;
+            if (curso_id) { queryAsignaturas += ' AND cal.calificacion_curso_id = ?'; paramsAsig.push(curso_id); }
+            if (asignatura_id) { queryAsignaturas += ' AND cal.calificacion_asignatura_id = ?'; paramsAsig.push(asignatura_id); }
+            queryAsignaturas += ' GROUP BY a.asignatura_id ORDER BY a.asignatura_nombre ASC';
+        }
+
         const [promediosPorAsignatura] = await db.query(queryAsignaturas, paramsAsig);
 
         // Búsqueda de estudiantes

@@ -318,6 +318,55 @@
     cursor: not-allowed;
 }
 
+/* Botón eliminar permanentemente (solo visible en usuarios inactivos) */
+.btn-accion.rojo-oscuro {
+    background-color: #fce8e6;
+    color: #d93025;
+}
+
+.btn-accion.rojo-oscuro:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+/* Modal de eliminación */
+.modal-eliminar {
+    text-align: center;
+    max-width: 440px;
+}
+
+.eliminar-icono {
+    margin-bottom: 16px;
+}
+
+.eliminar-advertencia {
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.eliminar-detalle {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 24px;
+}
+
+.btn-eliminar-confirmar {
+    padding: 10px 20px;
+    background-color: #d93025;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-eliminar-confirmar:hover {
+    background-color: #b31c12;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .contenido {

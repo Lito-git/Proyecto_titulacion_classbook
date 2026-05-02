@@ -41,6 +41,12 @@ export class CambiarContrasenaComponent {
     this.mensajeExito = '';
     this.mensajeError = '';
 
+    // Validamos que todos los campos estén completos
+    if (!this.contrasenaActual.trim() || !this.contrasenaNueva.trim() || !this.confirmarContrasena.trim()) {
+      this.mensajeError = 'Todos los campos son obligatorios.';
+      return;
+    }
+
     // Validamos que las contraseñas nuevas coincidan
     if (this.contrasenaNueva !== this.confirmarContrasena) {
       this.mensajeError = 'Las contraseñas nuevas no coinciden.';

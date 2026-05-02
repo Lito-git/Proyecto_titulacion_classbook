@@ -83,6 +83,11 @@ const cambiarContrasena = async (req, res) => {
     const { contrasenaActual, contrasenaNueva } = req.body;
     const usuarioId = req.usuario.id;
 
+    // Validar que los campos no estén vacíos
+    if (!contrasenaActual || !contrasenaActual.trim() || !contrasenaNueva || !contrasenaNueva.trim()) {
+        return res.status(400).json({ mensaje: 'Todos los campos son obligatorios.' });
+    }
+
     try {
         const [usuarios] = await db.query(
             'SELECT * FROM usuarios WHERE usuario_id = ?',
@@ -120,6 +125,11 @@ const cambiarContrasena = async (req, res) => {
 // Usa crypto para generar contraseña temporal segura
 const recuperarContrasena = async (req, res) => {
     const { email } = req.body;
+
+    // Validar que el email no esté vacío
+    if (!email || !email.trim()) {
+        return res.status(400).json({ mensaje: 'El correo electrónico es obligatorio.' });
+    }
 
     try {
         const [usuarios] = await db.query(

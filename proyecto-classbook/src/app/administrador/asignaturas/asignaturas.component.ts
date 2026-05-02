@@ -74,6 +74,13 @@ export class AsignaturasComponent implements OnInit {
   guardarAsignatura() {
     this.mensajeExito = '';
     this.mensajeError = '';
+
+    // Validamos que el nombre de la asignatura no esté vacío
+    if (!this.formulario.nombre.trim()) {
+      this.mensajeError = 'El nombre de la asignatura es obligatorio.';
+      return;
+    }
+
     this.cargando = true;
 
     if (this.modoEdicion) {

@@ -255,4 +255,14 @@ export class CalificacionesComponent implements OnInit {
     const suma = calificaciones.reduce((acc, c) => acc + parseFloat(c.calificacion_nota), 0);
     return (suma / calificaciones.length).toFixed(1);
   }
+  
+  //Para los badges de colores según la nota en la tabla de calificaciones
+  getClaseNota(nota: any): string {
+    const n = parseFloat(nota);
+    if (isNaN(n)) return '';
+    if (n >= 6.0) return 'nota-excelente';
+    if (n >= 5.0) return 'nota-bueno';
+    if (n >= 4.0) return 'nota-suficiente';
+    return 'nota-insuficiente';
+  }
 }
