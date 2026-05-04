@@ -111,8 +111,11 @@ const cambiarContrasena = async (req, res) => {
             [hashNueva, usuarioId]
         );
 
-        await notificarCambioContrasena(usuario.usuario_email, usuario.usuario_nombre);
-
+        try {
+            await notificarCambioContrasena(usuario.usuario_email, usuario.usuario_nombre);
+        } catch (mailError) {
+            console.error('Error al enviar notificación:', mailError.message);
+        }
         res.json({ mensaje: 'Contraseña actualizada correctamente.' });
 
     } catch (error) {
@@ -155,8 +158,11 @@ const recuperarContrasena = async (req, res) => {
             [hash, usuario.usuario_id]
         );
 
-        await enviarContrasenaTemp(email, usuario.usuario_nombre, contrasenaTemp, true);
-
+        try {
+            await enviarContrasenaTemp(email, usuario.usuario_nombre, contrasenaTemp, true);
+        } catch (mailError) {
+            console.error('Error al enviar correo:', mailError.message);
+        }
         res.json({ mensaje: 'Se envió una nueva contraseña temporal a tu correo.' });
 
     } catch (error) {
