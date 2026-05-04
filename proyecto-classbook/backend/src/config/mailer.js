@@ -4,7 +4,9 @@ require('dotenv').config();
 
 // Configuramos el transporter con las credenciales de Gmail desde el .env
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, //Para usar TLS en vez de SSL
   auth: {
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASS
