@@ -24,7 +24,13 @@ const inspectorRoutes = require('./src/routes/inspector.routes');
 const app = express();
 
 // Middlewares globales
-app.use(cors());          // Permite peticiones desde el frontend Angular
+app.use(cors({                              // Permite peticiones desde el frontend Angular
+  origin: [
+    'http://localhost:4200',
+    'https://classbook2026.netlify.app'
+  ],
+  credentials: true
+}));
 app.use(express.json());  // Permite leer el body de las peticiones en formato JSON
 
 // Registramos las rutas con sus prefijos
