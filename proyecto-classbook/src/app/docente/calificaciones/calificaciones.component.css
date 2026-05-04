@@ -1,3 +1,8 @@
+/* =====================================================
+   GESTIÓN DE CALIFICACIONES
+   ===================================================== */
+
+
 /* Layout principal */
 .layout {
     display: flex;
@@ -5,11 +10,12 @@
     background-color: #f5f5f5;
 }
 
-/* Contenido principal */
+/* Contenido desplazado por la navbar (230px) */
 .contenido {
     margin-left: 230px;
     padding: 40px;
     flex: 1;
+    min-width: 0;
 }
 
 /* Títulos */
@@ -27,7 +33,7 @@
     margin-bottom: 24px;
 }
 
-/* Campos */
+/* Campos del formulario */
 .campo {
     display: flex;
     flex-direction: column;
@@ -55,7 +61,7 @@
     border-color: #16a34a;
 }
 
-/* Card formulario */
+/* Card del formulario de registro */
 .formulario-card {
     background-color: #ffffff;
     border-radius: 8px;
@@ -71,6 +77,7 @@
     margin-bottom: 20px;
 }
 
+/* Grid del formulario: 3 columnas en desktop */
 .formulario-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -78,6 +85,7 @@
     margin-bottom: 16px;
 }
 
+/* Botón guardar calificación */
 .btn-guardar {
     display: flex;
     align-items: center;
@@ -103,7 +111,7 @@
     cursor: not-allowed;
 }
 
-/* Card tabla */
+/* Card de la tabla de calificaciones */
 .tabla-card {
     background-color: #ffffff;
     border-radius: 8px;
@@ -111,13 +119,16 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
+/* Contenedor con scroll horizontal para la tabla */
 .tabla-container {
     overflow-x: auto;
 }
 
+/* Tabla */
 .tabla {
     width: 100%;
     border-collapse: collapse;
+    min-width: 650px;
 }
 
 .tabla thead tr {
@@ -146,7 +157,7 @@
     border-bottom: none;
 }
 
-/* Botón editar nota */
+/* Botón editar nota (ícono lápiz) */
 .btn-editar-nota {
     background: none;
     border: none;
@@ -160,7 +171,7 @@
     color: #16a34a;
 }
 
-/* Input edición inline */
+/* Input de edición inline de nota */
 .input-nota {
     width: 60px;
     padding: 4px 6px;
@@ -170,7 +181,7 @@
     outline: none;
 }
 
-/* Botones ok y cancel en edición inline */
+/* Botones confirmar/cancelar edición inline */
 .btn-ok {
     background: none;
     border: none;
@@ -202,7 +213,7 @@
     margin-bottom: 12px;
 }
 
-/* Buscador de estudiante con sugerencias */
+/* Buscador de estudiante con sugerencias desplegables */
 .buscador-container {
     position: relative;
 }
@@ -222,7 +233,7 @@
     border-color: #16a34a;
 }
 
-/* Botón limpiar selección */
+/* Botón para limpiar el estudiante seleccionado */
 .btn-limpiar-est {
     position: absolute;
     right: 8px;
@@ -238,7 +249,7 @@
     margin: 0;
 }
 
-/* Lista de sugerencias */
+/* Dropdown de sugerencias */
 .sugerencias {
     position: absolute;
     top: 100%;
@@ -272,7 +283,7 @@
     color: #999;
 }
 
-/* Buscador de la tabla */
+/* Buscador de la tabla de calificaciones */
 .buscador-tabla {
     width: 100%;
     padding: 10px 12px;
@@ -289,7 +300,7 @@
     border-color: #16a34a;
 }
 
-/* Badge base */
+/* Badges de promedio por rango de nota */
 .badge-nota {
     padding: 3px 10px;
     border-radius: 20px;
@@ -297,7 +308,6 @@
     font-weight: 700;
 }
 
-/* Colores */
 .badge-nota.nota-excelente {
     background-color: #e6f4ea;
     color: #16a34a;
@@ -318,19 +328,36 @@
     color: #d93025;
 }
 
-/* Responsive */
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+    .contenido {
+        margin-left: 200px;
+        padding: 24px;
+    }
+
+    .formulario-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+
+/* =====================================================
+   MÓVIL
+   ===================================================== */
 @media (max-width: 768px) {
+
     .contenido {
         margin-left: 0;
-        padding: 20px;
+        padding: 16px;
+        padding-top: 64px;
     }
 
     .formulario-grid {
         grid-template-columns: 1fr;
-    }
-
-    .buscador-container {
-        width: 100%;
     }
 
     .tabla-container {

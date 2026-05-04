@@ -1,4 +1,3 @@
-// Importamos las dependencias necesarias
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, Router } from '@angular/router';
 
@@ -19,8 +18,8 @@ export class AuthGuard implements CanActivate {
       return false;
     }
 
-    // Verificamos que el token no haya expirado decodificando el payload
-    // sin necesidad de una librería externa (el payload es base64 estándar)
+    /* Verificamos que el token no haya expirado decodificando el payload
+    sin necesidad de una librería externa (el payload es base64 estándar)*/
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       // exp está en segundos, Date.now() en milisegundos

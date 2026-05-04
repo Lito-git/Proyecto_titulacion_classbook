@@ -10,8 +10,7 @@ const login = async (req, res) => {
     const { email, contrasena } = req.body;
 
     try {
-        // Buscamos el usuario por email — LIMIT 1 para evitar duplicados si el docente
-        // tiene múltiples asignaciones (el JOIN con docente_asignatura puede retornar N filas)
+        // Buscamos el usuario por email con LIMIT 1 para evitar duplicados, ya que el JOIN con docente_asignatura puede retornar N filas
         const [usuarios] = await db.query(
             `SELECT u.usuario_id, u.usuario_nombre, u.usuario_segundo_nombre, u.usuario_apellido,
                     u.usuario_segundo_apellido, u.usuario_email, u.usuario_contrasena,
@@ -121,8 +120,7 @@ const cambiarContrasena = async (req, res) => {
     }
 };
 
-// Controlador de recuperación de contraseña
-// Usa crypto para generar contraseña temporal segura
+// Controlador de recuperación de contraseña que usa crypto para generar contraseña temporal segura
 const recuperarContrasena = async (req, res) => {
     const { email } = req.body;
 

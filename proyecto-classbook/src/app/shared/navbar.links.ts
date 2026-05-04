@@ -1,5 +1,4 @@
-// Constantes de links de navegación para cada rol
-// Centraliza los links para no repetir código en cada componente
+// Constantes de links de navegación para cada rol para entralizar los links y no repetir código en cada componente
 import { NavLink } from './navbar/navbar.component';
 
 // Links del administrador
@@ -60,7 +59,6 @@ export const LINKS_DOCENTE: NavLink[] = [
     }
 ];
 
-// Links del inspector (se completarán en el Día 7)
 // Links del inspector
 export const LINKS_INSPECTOR: NavLink[] = [
     {

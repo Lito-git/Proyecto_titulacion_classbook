@@ -1,4 +1,3 @@
-// Importamos las dependencias necesarias
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -65,7 +64,6 @@ export class AnotacionesComponent implements OnInit {
     this.cargarAnotaciones();
 
     // Cargamos todos los estudiantes de todos los cursos del docente
-    // usando el nuevo endpoint /docente/:id/estudiantes
     this.http.get<any[]>(`${this.apiUrl}/docente/${id}/estudiantes`, { headers: this.getHeaders() }).subscribe({
       next: (data) => this.estudiantes = data,
       error: (err) => console.error('Error al cargar estudiantes', err)

@@ -1,18 +1,20 @@
-/* Layout principal */
+/* =====================================================
+   INICIO
+   ===================================================== */
+
 .layout {
     display: flex;
     min-height: 100vh;
     background-color: #f5f5f5;
 }
 
-/* Contenido principal */
 .contenido {
     margin-left: 230px;
     padding: 40px;
     flex: 1;
+    min-width: 0;
 }
 
-/* Saludo */
 .titulo {
     font-family: 'Nunito Sans', sans-serif;
     font-size: 24px;
@@ -35,7 +37,6 @@
     margin-bottom: 24px;
 }
 
-/* Tarjeta individual */
 .tarjeta {
     background-color: #ffffff;
     border-radius: 8px;
@@ -60,7 +61,7 @@
     color: #999;
 }
 
-/* Card actividad reciente */
+/* Card de actividad reciente */
 .card {
     background-color: #ffffff;
     border-radius: 8px;
@@ -75,7 +76,6 @@
     margin-bottom: 20px;
 }
 
-/* Item de actividad */
 .actividad-item {
     display: flex;
     justify-content: space-between;
@@ -112,7 +112,6 @@
     margin-left: 16px;
 }
 
-/* Sin datos */
 .sin-datos {
     text-align: center;
     padding: 32px 0;
@@ -120,11 +119,28 @@
     color: #999;
 }
 
-/* Responsive */
+/* =====================================================
+   TABLET
+   ===================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .contenido {
+        margin-left: 200px;
+        padding: 24px;
+    }
+
+    .tarjetas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* =====================================================
+   MÓVIL
+   ===================================================== */
 @media (max-width: 768px) {
     .contenido {
         margin-left: 0;
-        padding: 20px;
+        padding: 16px;
+        padding-top: 64px;
     }
 
     .tarjetas {

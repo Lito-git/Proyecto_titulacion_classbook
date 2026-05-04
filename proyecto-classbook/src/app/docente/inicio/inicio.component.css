@@ -1,3 +1,8 @@
+/* =====================================================
+   INICIO (PANEL)
+   ===================================================== */
+
+
 /* Layout principal */
 .layout {
     display: flex;
@@ -5,11 +10,12 @@
     background-color: #f5f5f5;
 }
 
-/* Contenido principal */
+/* Contenido desplazado por la navbar (230px) */
 .contenido {
     margin-left: 230px;
     padding: 40px;
     flex: 1;
+    min-width: 0;
 }
 
 /* Saludo */
@@ -27,7 +33,7 @@
     margin-bottom: 32px;
 }
 
-/* Grid de tarjetas */
+/* Grid de tarjetas de resumen: 4 columnas en desktop */
 .tarjetas {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -60,7 +66,7 @@
     color: #999;
 }
 
-/* Fila inferior */
+/* Fila inferior: 2 cards en desktop */
 .fila-inferior {
     display: grid;
     grid-template-columns: 1fr 2fr;
@@ -82,7 +88,7 @@
     margin-bottom: 20px;
 }
 
-/* Item de asignación */
+/* Item de asignación de curso */
 .asignacion-item {
     padding: 12px 0;
     border-bottom: 1px solid #f0f0f0;
@@ -109,7 +115,7 @@
     color: #16a34a;
 }
 
-/* Actividad reciente */
+/* Items de actividad reciente */
 .actividad-item {
     display: flex;
     align-items: center;
@@ -160,18 +166,51 @@
     padding: 24px 0;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+
     .contenido {
-        margin-left: 0;
-        padding: 20px;
+        margin-left: 200px;
+        padding: 24px;
     }
 
+    /* 2 tarjetas por fila en tablet */
     .tarjetas {
         grid-template-columns: repeat(2, 1fr);
     }
 
+    /* La fila inferior pasa a columna única en tablet */
     .fila-inferior {
         grid-template-columns: 1fr;
+    }
+}
+
+
+/* =====================================================
+   MÓVIL
+   ===================================================== */
+@media (max-width: 768px) {
+
+    .contenido {
+        margin-left: 0;
+        padding: 16px;
+        padding-top: 64px;
+    }
+
+    /* Una tarjeta por fila en móvil */
+    .tarjetas {
+        grid-template-columns: 1fr;
+    }
+
+    .fila-inferior {
+        grid-template-columns: 1fr;
+    }
+
+    .actividad-item {
+        flex-wrap: wrap;
+        gap: 6px;
     }
 }

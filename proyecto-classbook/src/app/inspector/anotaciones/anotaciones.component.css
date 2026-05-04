@@ -1,18 +1,20 @@
-/* Layout principal */
+/* =====================================================
+   ANOTACIONES
+   ===================================================== */
+
 .layout {
     display: flex;
     min-height: 100vh;
     background-color: #f5f5f5;
 }
 
-/* Contenido principal */
 .contenido {
     margin-left: 230px;
     padding: 40px;
     flex: 1;
+    min-width: 0;
 }
 
-/* Títulos */
 .titulo {
     font-family: 'Nunito Sans', sans-serif;
     font-size: 24px;
@@ -27,7 +29,7 @@
     margin-bottom: 24px;
 }
 
-/* Tarjetas resumen */
+/* Tarjetas resumen positivas/negativas */
 .tarjetas {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -35,6 +37,7 @@
     margin-bottom: 24px;
 }
 
+/* Tarjeta positivas (verde) y negativas (roja) */
 .tarjeta-positivas,
 .tarjeta-negativas {
     border-radius: 8px;
@@ -64,7 +67,7 @@
     opacity: 0.85;
 }
 
-/* Card filtros */
+/* Card de filtros */
 .filtros-card {
     background-color: #ffffff;
     border-radius: 8px;
@@ -83,6 +86,7 @@
     gap: 8px;
 }
 
+/* Grid de filtros */
 .filtros-grid {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr;
@@ -191,6 +195,7 @@
 .filtros-tipo {
     display: flex;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
 .btn-filtro {
@@ -212,17 +217,17 @@
 
 .btn-filtro.positivo.activo {
     background-color: #16a34a;
-    border-color: #16a34a;
     color: white;
+    border-color: #16a34a;
 }
 
 .btn-filtro.negativo.activo {
     background-color: #d93025;
-    border-color: #d93025;
     color: white;
+    border-color: #d93025;
 }
 
-/* Lista de anotaciones */
+/* Card lista de anotaciones */
 .lista-card {
     background-color: #ffffff;
     border-radius: 8px;
@@ -249,7 +254,6 @@
     border-bottom: none;
 }
 
-/* Icono */
 .anotacion-icono {
     width: 40px;
     height: 40px;
@@ -270,9 +274,9 @@
     color: #d93025;
 }
 
-/* Contenido */
 .anotacion-contenido {
     flex: 1;
+    min-width: 0;
 }
 
 .anotacion-header {
@@ -295,7 +299,6 @@
     color: #0d2d5e;
 }
 
-/* Badges */
 .badge-tipo {
     padding: 2px 10px;
     border-radius: 20px;
@@ -318,14 +321,12 @@
     color: #999;
 }
 
-/* Descripción */
 .anotacion-descripcion {
     font-size: 14px;
     color: #333;
     margin-bottom: 8px;
 }
 
-/* Metadatos */
 .anotacion-meta {
     display: flex;
     gap: 16px;
@@ -340,7 +341,6 @@
     color: #999;
 }
 
-/* Sin datos */
 .sin-datos {
     text-align: center;
     padding: 32px 0;
@@ -348,27 +348,44 @@
     color: #999;
 }
 
-/* Responsive */
+/* =====================================================
+   TABLET
+   ===================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .contenido {
+        margin-left: 200px;
+        padding: 24px;
+    }
+
+    .filtros-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* =====================================================
+   MÓVIL
+   ===================================================== */
 @media (max-width: 768px) {
     .contenido {
         margin-left: 0;
-        padding: 20px;
+        padding: 16px;
+        padding-top: 64px;
     }
 
     .tarjetas {
         grid-template-columns: 1fr;
     }
 
+    .tarjeta-positivas,
+    .tarjeta-negativas {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 20px 24px;
+    }
+
     .filtros-grid {
         grid-template-columns: 1fr;
-    }
-
-    .filtros-tipo {
-        flex-wrap: wrap;
-    }
-
-    .buscador-container {
-        width: 100%;
     }
 
     .anotacion-meta {

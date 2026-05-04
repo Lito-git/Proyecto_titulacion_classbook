@@ -137,7 +137,6 @@ const obtenerCalificaciones = async (req, res) => {
 };
 
 // Obtener anotaciones positivas del estudiante
-// Fix: subquery para evitar duplicados cuando el profesor tiene múltiples cursos asignados
 const obtenerAnotacionesPositivas = async (req, res) => {
     const { id } = req.params;
 

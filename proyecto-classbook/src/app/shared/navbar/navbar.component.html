@@ -1,36 +1,51 @@
-<!-- Navbar lateral compartida para todos los roles -->
+<!-- Navbar lateral-->
+<!--
+  HAMBURGER MENU (solo para version móvil):
+-->
+<!-- Checkbox oculto que controla el estado abierto/cerrado del menú en móvil -->
+<input type="checkbox" id="nav-toggle" class="nav-toggle" />
+<!-- Overlay oscuro que aparece detrás del menú en móvil al abrirse -->
+<label for="nav-toggle" class="nav-overlay"></label>
+<!-- Botón hamburger visible solo en móvil, ubicado en la esquina superior izquierda -->
+<label for="nav-toggle" class="nav-hamburger" aria-label="Abrir menú">
+    <!-- Tres líneas del ícono hamburger -->
+    <span></span>
+    <span></span>
+    <span></span>
+</label>
+<!-- Navbar lateral principal -->
 <nav class="navbar">
-
-    <!-- Logo y título -->
-    <div class="navbar-logo">
-        <img src="classbook_logo.png" alt="ClassBook" class="navbar-logo-img" />
-        <span class="navbar-logo-texto">ClassBook</span>
-    </div>
-
-    <!-- Info del usuario -->
-    <div class="navbar-usuario">
-        <div class="navbar-usuario-avatar">{{ nombre[0] }}{{ apellido[0] }}</div>
-        <div class="navbar-usuario-info">
-            <span class="navbar-usuario-nombre">{{ nombre }} {{ apellido }}</span>
-            <span class="navbar-usuario-rol">{{ getRolSubtitulo() }}</span>
+    <div class="navbar-inner">
+        <!-- Logo y título de la aplicación -->
+        <div class="navbar-logo">
+            <img src="classbook_logo.png" alt="ClassBook" class="navbar-logo-img" />
+            <span class="navbar-logo-texto">ClassBook</span>
         </div>
+        <!-- Información del usuario logueado -->
+        <div class="navbar-usuario">
+            <!-- Avatar circular con iniciales del usuario -->
+            <div class="navbar-usuario-avatar">{{ nombre[0] }}{{ apellido[0] }}</div>
+            <div class="navbar-usuario-info">
+                <span class="navbar-usuario-nombre">{{ nombre }} {{ apellido }}</span>
+                <span class="navbar-usuario-rol">{{ getRolSubtitulo() }}</span>
+            </div>
+        </div>
+        <!-- Links de navegación generados dinámicamente según el rol -->
+        <ul class="navbar-links">
+            <li *ngFor="let link of links">
+                <a [routerLink]="link.ruta" routerLinkActive="activo"
+                    [routerLinkActiveOptions]="{exact: link.ruta === rutaBase}" (click)="cerrarMenuMovil()">
+                    <!-- Ícono SVG del link renderizado como HTML dinámico -->
+                    <span [innerHTML]="link.icono"></span>
+                    {{ link.label }}
+                </a>
+            </li>
+        </ul>
     </div>
-
-    <!-- Links de navegación -->
-    <ul class="navbar-links">
-        <li *ngFor="let link of links">
-            <a [routerLink]="link.ruta" routerLinkActive="activo"
-                [routerLinkActiveOptions]="{exact: link.ruta === rutaBase}">
-                <!-- Icono SVG renderizado dinámicamente -->
-                <span [innerHTML]="link.icono"></span>
-                {{ link.label }}
-            </a>
-        </li>
-    </ul>
-
-    <!-- Cerrar sesión -->
+    <!-- Sección inferior con botón cerrar sesión -->
     <div class="navbar-footer">
         <button class="btn-cerrar-sesion" (click)="cerrarSesion()">
+            <!-- Ícono de salida/logout -->
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -40,5 +55,4 @@
             Cerrar sesión
         </button>
     </div>
-
 </nav>

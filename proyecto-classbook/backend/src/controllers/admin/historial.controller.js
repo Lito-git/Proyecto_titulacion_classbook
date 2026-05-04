@@ -1,7 +1,7 @@
 // Importamos la conexión a la base de datos
-const db = require('../config/db');
+const db = require('../../config/db');
 
-// Obtener el total de registros del historial (para el dashboard del admin)
+// Obtener el total de registros del historial para el dashboard del Administrador
 const obtenerTotalHistorial = async (req, res) => {
     try {
         const [resultado] = await db.query(
@@ -13,8 +13,7 @@ const obtenerTotalHistorial = async (req, res) => {
     }
 };
 
-// Obtener registros del historial con filtros opcionales
-// Soporta parámetro limit para el dashboard (evita traer toda la tabla)
+// Obtener registros del historial con filtros opcionales con Soporte para el parámetro limit para el dashboard y evitar traer toda la tabla
 const obtenerHistorial = async (req, res) => {
     const { tipo, usuario_id, fecha_inicio, fecha_fin, limit } = req.query;
 
@@ -50,7 +49,7 @@ const obtenerHistorial = async (req, res) => {
 
         query += ' ORDER BY h.historial_fecha_cambio DESC';
 
-        // Soporte para limit — usado por el dashboard para no traer toda la tabla
+        // Soporte para limit que será usado por el dashboard para no traer toda la tabla
         if (limit && !isNaN(parseInt(limit))) {
             query += ` LIMIT ?`;
             params.push(parseInt(limit));

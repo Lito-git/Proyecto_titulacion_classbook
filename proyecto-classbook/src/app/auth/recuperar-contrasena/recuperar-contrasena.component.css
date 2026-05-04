@@ -1,6 +1,9 @@
+/* =====================================================
+   RECUPERAR CONTRASEÑA
+   ===================================================== */
+
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap');
 
-/* Reutilizamos el mismo estilo visual del login para consistencia */
 .login-container {
     display: flex;
     justify-content: center;
@@ -118,7 +121,9 @@ button:disabled {
     text-decoration: underline;
 }
 
-/* Responsive */
+/* =====================================================
+   MOVIL
+   ===================================================== */
 @media (max-width: 768px) {
     .login-container {
         padding: 20px;

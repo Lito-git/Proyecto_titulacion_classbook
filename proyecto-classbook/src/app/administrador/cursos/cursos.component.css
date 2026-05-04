@@ -1,3 +1,8 @@
+/* =====================================================
+   GESTIÓN DE CURSOS
+   ===================================================== */
+
+
 /* Layout principal */
 .layout {
     display: flex;
@@ -5,14 +10,14 @@
     background-color: #f5f5f5;
 }
 
-/* Contenido principal */
 .contenido {
     margin-left: 230px;
     padding: 40px;
     flex: 1;
+    min-width: 0;
 }
 
-/* Encabezado */
+/* Encabezado con título y botón crear */
 .encabezado {
     display: flex;
     justify-content: space-between;
@@ -33,7 +38,7 @@
     color: #999;
 }
 
-/* Botón crear */
+/* Botón crear curso */
 .btn-crear {
     padding: 10px 20px;
     background-color: #7c3aed;
@@ -44,20 +49,34 @@
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
+    white-space: nowrap;
 }
 
 .btn-crear:hover {
     background-color: #6d28d9;
 }
 
-/* Grid de tarjetas */
+/* Mensajes de éxito y error */
+.exito {
+    color: #1e8e3e;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.error {
+    color: #d93025;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+/* Grid de tarjetas de cursos */
 .grid-cursos {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
 }
 
-/* Tarjeta de curso */
+/* Tarjeta individual de un curso */
 .tarjeta-curso {
     background-color: #ffffff;
     border-radius: 8px;
@@ -66,7 +85,7 @@
     position: relative;
 }
 
-/* Badge activo */
+/* Badge "Activo" posicionado en la esquina */
 .badge-activo {
     position: absolute;
     top: 16px;
@@ -95,22 +114,48 @@
     margin-bottom: 20px;
 }
 
-/* Acciones de la tarjeta */
+/* Número de estudiantes matriculados */
+.curso-estudiantes {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.curso-estudiantes-numero {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0d2d5e;
+}
+
+.curso-estudiantes-label {
+    font-size: 13px;
+    color: #999;
+}
+
+/* Botones de acción de la tarjeta (editar y eliminar) */
 .curso-acciones {
     display: flex;
     gap: 10px;
 }
 
-.btn-editar {
+.btn-editar,
+.btn-eliminar {
     flex: 1;
     padding: 8px;
-    background-color: #f5f5f5;
     border: none;
     border-radius: 6px;
     font-size: 13px;
     cursor: pointer;
-    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     transition: background-color 0.2s;
+}
+
+.btn-editar {
+    background-color: #f5f5f5;
+    color: #333;
 }
 
 .btn-editar:hover {
@@ -118,22 +163,18 @@
 }
 
 .btn-eliminar {
-    flex: 1;
-    padding: 8px;
     background-color: #fce8e6;
-    border: none;
-    border-radius: 6px;
-    font-size: 13px;
-    cursor: pointer;
     color: #d93025;
-    transition: background-color 0.2s;
 }
 
 .btn-eliminar:hover {
     background-color: #f5c6c3;
 }
 
-/* Modal */
+/* -------------------------------------------------------
+   MODAL
+   ------------------------------------------------------- */
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -145,6 +186,8 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    padding: 16px;
+    box-sizing: border-box;
 }
 
 .modal {
@@ -154,6 +197,8 @@
     width: 100%;
     max-width: 480px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-titulo {
@@ -176,16 +221,19 @@
     margin-bottom: 6px;
 }
 
-.campo input {
+.campo input,
+.campo select {
     padding: 10px 12px;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s;
+    background-color: #ffffff;
 }
 
-.campo input:focus {
+.campo input:focus,
+.campo select:focus {
     border-color: #7c3aed;
 }
 
@@ -227,64 +275,32 @@
     cursor: not-allowed;
 }
 
-.exito {
-    color: #1e8e3e;
-    font-size: 13px;
-    margin-bottom: 12px;
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+    .contenido {
+        margin-left: 200px;
+        padding: 24px;
+    }
+
+    .grid-cursos {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
-.error {
-    color: #d93025;
-    font-size: 13px;
-    margin-bottom: 12px;
-}
 
-/* Alineación icono + texto en botones */
-.btn-editar,
-.btn-eliminar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-}
-
-/* Estudiantes matriculados */
-.curso-estudiantes {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-}
-
-.curso-estudiantes-numero {
-    font-size: 28px;
-    font-weight: 800;
-    color: #0d2d5e;
-}
-
-.curso-estudiantes-label {
-    font-size: 13px;
-    color: #999;
-}
-
-.campo select {
-    padding: 10px 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-    background-color: #ffffff;
-}
-
-.campo select:focus {
-    border-color: #7c3aed;
-}
-
-/* Responsive */
+/* =====================================================
+   MÓVIL
+   ===================================================== */
 @media (max-width: 768px) {
+
     .contenido {
         margin-left: 0;
-        padding: 20px;
+        padding: 16px;
+        padding-top: 64px;
     }
 
     .encabezado {
@@ -293,7 +309,27 @@
         gap: 12px;
     }
 
+    .btn-crear {
+        width: 100%;
+        text-align: center;
+    }
+
     .grid-cursos {
         grid-template-columns: 1fr;
+    }
+
+    .modal {
+        padding: 20px;
+        max-width: 100%;
+    }
+
+    .modal-acciones {
+        flex-direction: column-reverse;
+    }
+
+    .btn-cancelar,
+    .btn-guardar {
+        width: 100%;
+        text-align: center;
     }
 }

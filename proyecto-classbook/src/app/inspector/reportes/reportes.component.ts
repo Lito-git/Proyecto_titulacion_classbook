@@ -36,7 +36,7 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
   grafico: any = null;
   private resizeObserver: ResizeObserver | null = null;
 
-  // Fix bug 3: guardamos el timeout para poder cancelarlo
+  // Guardamos el timeout para poder cancelarlo
   private renderTimeout: any = null;
 
   private apiUrl = 'http://localhost:3000';
@@ -52,7 +52,9 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.renderTimeout) clearTimeout(this.renderTimeout);
+
     if (this.resizeObserver) this.resizeObserver.disconnect();
+
     if (this.grafico) this.grafico.destroy();
   }
 
@@ -73,7 +75,7 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   cargarReportes() {
-    // Fix bug 3: cancelar timeout pendiente antes de lanzar uno nuevo
+    // Cancelar timeout pendiente antes de lanzar uno nuevo
     if (this.renderTimeout) {
       clearTimeout(this.renderTimeout);
       this.renderTimeout = null;
@@ -81,8 +83,9 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     let params: string[] = [];
     if (this.cursoSeleccionado) params.push(`curso_id=${this.cursoSeleccionado}`);
+
     if (this.asignaturaSeleccionada) params.push(`asignatura_id=${this.asignaturaSeleccionada}`);
-    // Fix bug 2: solo enviar búsqueda de texto si NO hay estudiante seleccionado
+
     if (!this.estudianteSeleccionado && this.busquedaEstudiante) {
       params.push(`busqueda=${this.busquedaEstudiante}`);
     }
@@ -99,7 +102,7 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.estudiantesResultado = data.estudiantes;
         this.notasEstudiante = data.notasEstudiante;
 
-        // Fix bug 1: forzar detección de cambios primero para que Angular
+        // Forzar detección de cambios primero para que Angular
         // actualice el *ngIf y el canvas esté en el DOM antes de renderizar
         this.cdr.detectChanges();
 
@@ -145,7 +148,7 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   renderizarGrafico() {
-    // Fix bug 1: verificar que el canvas exista en el DOM en este momento
+    // Verificar que el canvas exista en el DOM en este momento
     if (!this.graficoCanvas?.nativeElement) return;
 
     const datos = this.estudianteSeleccionado && this.notasEstudiante.length > 0

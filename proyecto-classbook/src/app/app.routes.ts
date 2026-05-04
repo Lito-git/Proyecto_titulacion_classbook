@@ -1,10 +1,8 @@
-// Importamos las dependencias necesarias
 import { Routes } from '@angular/router';
 import { AuthGuard } from './auth/guards/auth.guard';
 
 // Definimos las rutas principales de la aplicación
-// Cada módulo de rol se carga con lazy loading (loadChildren)
-// lo que significa que solo se descarga cuando el usuario navega a esa ruta
+// Cada módulo de rol se carga con lazy loading (loadChildren) para que solo se cargue cuando el usuario navega a esa ruta
 export const routes: Routes = [
   // Ruta por defecto redirige al login
   { path: '', redirectTo: 'login', pathMatch: 'full' },

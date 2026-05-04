@@ -1,4 +1,3 @@
-// Importamos las dependencias necesarias
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';

@@ -1,7 +1,7 @@
 // Importamos las dependencias necesarias
 const express = require('express');
 const router = express.Router();
-const verificarToken = require('../middleware/auth');
+const verificarToken = require('../../middleware/auth');
 const {
     obtenerUsuarios,
     crearUsuario,
@@ -10,7 +10,7 @@ const {
     obtenerRoles,
     toggleActivoUsuario,
     eliminarUsuario
-} = require('../controllers/usuarios.controller');
+} = require('../../controllers/admin/usuarios.controller');
 
 // GET /usuarios -> obtiene todos los usuarios
 router.get('/', verificarToken, obtenerUsuarios);

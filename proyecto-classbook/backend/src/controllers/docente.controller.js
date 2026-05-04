@@ -53,8 +53,7 @@ const obtenerEstudiantesPorCurso = async (req, res) => {
     }
 };
 
-// Obtener todos los estudiantes de todos los cursos asignados al docente
-// Usado en el módulo de anotaciones para mostrar estudiantes de todos sus cursos
+// Obtener todos los estudiantes de todos los cursos asignados al docente que usará el módulo de anotaciones para mostrar estudiantes de todos sus cursos
 const obtenerEstudiantesDelDocente = async (req, res) => {
     const { id } = req.params;
     try {

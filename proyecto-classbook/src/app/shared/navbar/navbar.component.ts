@@ -1,13 +1,12 @@
-// Importamos las dependencias necesarias
 import { Component, Input, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 // Interfaz para definir la estructura de cada link del navbar
 export interface NavLink {
-  label: string;    // Texto del link
-  ruta: string;     // Ruta de navegación
-  icono: string;    // SVG del icono como string
+  label: string;
+  ruta: string;
+  icono: string;
 }
 
 @Component({
@@ -50,5 +49,13 @@ export class NavbarComponent implements OnInit {
   cerrarSesion() {
     sessionStorage.clear();
     this.router.navigate(['/login']);
+  }
+
+  // Cierra el menú móvil.
+  cerrarMenuMovil() {
+    const toggle = document.getElementById('nav-toggle') as HTMLInputElement;
+    if (toggle) {
+      toggle.checked = false;
+    }
   }
 }

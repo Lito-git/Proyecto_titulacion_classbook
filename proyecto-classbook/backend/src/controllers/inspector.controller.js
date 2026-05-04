@@ -1,7 +1,7 @@
 // Importamos la conexión a la base de datos
 const db = require('../config/db');
 
-// Obtener resumen del dashboard del inspector
+// Obtener el resumen del dashboard del inspector
 const obtenerResumenInspector = async (req, res) => {
     try {
         // Promedio general del establecimiento
@@ -25,7 +25,7 @@ const obtenerResumenInspector = async (req, res) => {
        AND YEAR(anotacion_fecha) = YEAR(NOW())`
         );
 
-        // Casos que requieren seguimiento: estudiantes con 3 o más anotaciones negativas este mes
+        // Casos que requieren seguimiento para estudiantes con 3 o más anotaciones negativas este mes
         const [casosSeguimiento] = await db.query(
             `SELECT COUNT(*) AS total FROM (
         SELECT anotacion_estudiante_id
@@ -55,7 +55,7 @@ const obtenerResumenInspector = async (req, res) => {
        ORDER BY c.curso_nombre ASC`
         );
 
-        // Alertas recientes: estudiantes con muchas anotaciones negativas
+        // Alertas recientes para estudiantes con muchas anotaciones negativas
         const [alertasNegativas] = await db.query(
             `SELECT 
         u.usuario_nombre,
@@ -114,7 +114,7 @@ const obtenerReportes = async (req, res) => {
 
     try {
 
-        // Promedio general — ahora respeta los filtros activos
+        // Promedio general
         let queryPromedio = `SELECT ROUND(AVG(calificacion_nota), 1) AS promedio FROM calificaciones WHERE 1=1`;
         const paramsPromedio = [];
         if (curso_id) { queryPromedio += ' AND calificacion_curso_id = ?'; paramsPromedio.push(curso_id); }
@@ -185,7 +185,7 @@ const obtenerReportes = async (req, res) => {
             estudiantes = result;
         }
 
-        // Notas del estudiante seleccionado — ahora también filtra por asignatura_id
+        // Notas del estudiante seleccionado
         let notasEstudiante = [];
         if (estudiante_id) {
             let queryNotas = `

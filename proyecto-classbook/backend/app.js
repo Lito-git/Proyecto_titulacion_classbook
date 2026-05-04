@@ -9,10 +9,10 @@ const db = require('./src/config/db');
 // Importamos las rutas
 const authRoutes = require('./src/routes/auth.routes');
 
-const usuariosRoutes = require('./src/routes/usuarios.routes');
-const cursosRoutes = require('./src/routes/cursos.routes');
-const asignaturasRoutes = require('./src/routes/asignaturas.routes');
-const historialRoutes = require('./src/routes/historial.routes');
+const usuariosRoutes = require('./src/routes/admin/usuarios.routes');
+const cursosRoutes = require('./src/routes/admin/cursos.routes');
+const asignaturasRoutes = require('./src/routes/admin/asignaturas.routes');
+const historialRoutes = require('./src/routes/admin/historial.routes');
 
 const docenteRoutes = require('./src/routes/docente.routes');
 
@@ -57,7 +57,7 @@ app.get('/test-db', async (req, res) => {
 });
 
 // Ruta para verificar el estado de los servicios del sistema
-// Intenta hacer una consulta simple a la BD para verificar su estado
+// Intentamos hacer una consulta simple a la BD para verificar su estado
 app.get('/estado', async (req, res) => {
   try {
     await db.query('SELECT 1');

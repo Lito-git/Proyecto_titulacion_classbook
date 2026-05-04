@@ -1,5 +1,5 @@
 // Importamos la conexión a la base de datos
-const db = require('../config/db');
+const db = require('../../config/db');
 
 // Obtener todos los cursos con el conteo de estudiantes matriculados
 const obtenerCursos = async (req, res) => {
@@ -48,7 +48,7 @@ const editarCurso = async (req, res) => {
     }
 };
 
-// Eliminar un curso — verifica que no tenga usuarios ACTIVOS asociados
+// Eliminar un curso verificando que no tenga usuarios ACTIVOS
 const eliminarCurso = async (req, res) => {
     const { id } = req.params;
     try {
@@ -68,7 +68,7 @@ const eliminarCurso = async (req, res) => {
 
         // Verificamos si hay docentes con usuario activo asignados al curso
         const [conDocentes] = await db.query(
-            `SELECT COUNT(*) AS total 
+            `SELECT COUNT(*) AS total
              FROM docente_asignatura da
              JOIN usuarios u ON u.usuario_id = da.docente_usuario_id
              WHERE da.curso_id = ? AND u.usuario_activo = 1`,

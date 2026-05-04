@@ -11,8 +11,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Función para enviar contraseña temporal
-// esRecuperacion: true = recuperación de contraseña, false = cuenta nueva
+// Función para enviar contraseña temporal, donde esRecuperacion: true = recuperación de contraseña, false = cuenta nueva
 const enviarContrasenaTemp = async (destinatario, nombre, contrasenaTemp, esRecuperacion = false) => {
   const mensajeCuerpo = esRecuperacion
     ? 'Recibimos una solicitud para restablecer tu contraseña. Tu nueva contraseña temporal es:'

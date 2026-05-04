@@ -1,8 +1,8 @@
 // Importamos las dependencias necesarias
-const db = require('../config/db');
+const db = require('../../config/db');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const { enviarContrasenaTemp } = require('../config/mailer');
+const { enviarContrasenaTemp } = require('../../config/mailer');
 
 // Función auxiliar para generar una contraseña temporal segura
 const generarContrasenaTemp = () => {
@@ -58,7 +58,7 @@ const crearUsuario = async (req, res) => {
         const contrasenaTemp = generarContrasenaTemp();
         const hash = await bcrypt.hash(contrasenaTemp, 10);
 
-        // Iniciamos la transacción — si algo falla, se revierte todo
+        // Iniciamos la transacción y si algo falla, se revierte todo
         await conn.beginTransaction();
 
         const [resultado] = await conn.query(
@@ -99,7 +99,7 @@ const crearUsuario = async (req, res) => {
             );
         }
 
-        // Todo salió bien, confirmamos la transacción
+        // Todo salió bien entonces confirmamos la transacción
         await conn.commit();
         conn.release();
 
@@ -134,7 +134,7 @@ const editarUsuario = async (req, res) => {
     }
 };
 
-// Resetear contraseña de un usuario (solo administrador)
+// Resetear contraseña de un usuario en el panel del Administrador.
 const resetearContrasena = async (req, res) => {
     const { id } = req.params;
 
@@ -177,7 +177,7 @@ const obtenerRoles = async (req, res) => {
     }
 };
 
-// Activa o desactiva un usuario (soft delete)
+// Activa o desactiva un usuario (Soft Delete)
 const toggleActivoUsuario = async (req, res) => {
     const { id } = req.params;
     try {
@@ -205,8 +205,7 @@ const toggleActivoUsuario = async (req, res) => {
     }
 };
 
-// Eliminar físicamente un usuario y todos sus datos asociados en cascada
-// Solo disponible para el Administrador bajo circunstancias justificadas
+// Eliminar físicamente un usuario y todos sus datos asociados en cascada en Panel de Administrador.
 const eliminarUsuario = async (req, res) => {
     const { id } = req.params;
     const conn = await db.getConnection();
@@ -298,7 +297,6 @@ const eliminarUsuario = async (req, res) => {
         }
 
         // Finalmente eliminamos el usuario
-        // Para inspector y administrador no hay datos adicionales que limpiar
         await conn.query('DELETE FROM usuarios WHERE usuario_id = ?', [id]);
 
         await conn.commit();

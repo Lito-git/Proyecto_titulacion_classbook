@@ -1,3 +1,8 @@
+/* =====================================================
+   GESTIÓN DE USUARIOS
+   ===================================================== */
+
+
 /* Layout principal */
 .layout {
     display: flex;
@@ -5,11 +10,11 @@
     background-color: #f5f5f5;
 }
 
-/* Contenido principal */
 .contenido {
     margin-left: 230px;
     padding: 40px;
     flex: 1;
+    min-width: 0;
 }
 
 /* Encabezado con título y botón crear */
@@ -44,13 +49,14 @@
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
+    white-space: nowrap;
 }
 
 .btn-crear:hover {
     background-color: #6d28d9;
 }
 
-/* Buscador */
+/* Buscador de usuarios */
 .buscador {
     width: 100%;
     padding: 10px 16px;
@@ -67,17 +73,19 @@
     border-color: #7c3aed;
 }
 
-/* Tabla */
+/* Contenedor de la tabla con scroll horizontal para las pantallas chicas */
 .tabla-container {
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
+    overflow-x: auto;
 }
 
+/* Tabla de usuarios */
 .tabla {
     width: 100%;
     border-collapse: collapse;
+    min-width: 700px;
 }
 
 .tabla thead tr {
@@ -91,6 +99,7 @@
     font-weight: 600;
     color: #999;
     text-align: left;
+    white-space: nowrap;
 }
 
 .tabla td {
@@ -104,7 +113,7 @@
     border-bottom: none;
 }
 
-/* Fila de usuario inactivo */
+/* Fila de usuario inactivo (atenuado) */
 .tabla tbody tr.inactivo td {
     color: #bbb;
 }
@@ -155,12 +164,13 @@
     color: #999;
 }
 
-/* Botones de acción */
+/* Celda de acciones con los botones de acción */
 .acciones {
     display: flex;
     gap: 8px;
 }
 
+/* Botones de acción (iconos) */
 .btn-accion {
     width: 30px;
     height: 30px;
@@ -197,7 +207,40 @@
     color: #1e8e3e;
 }
 
-/* Modal */
+.btn-accion.rojo-oscuro {
+    background-color: #fce8e6;
+    color: #d93025;
+}
+
+/* Botones deshabilitados */
+.btn-accion:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.btn-accion.rojo-oscuro:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+/* Mensajes de éxito y error */
+.exito {
+    color: #1e8e3e;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.error {
+    color: #d93025;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+/* -------------------------------------------------------
+   MODAL - Para crear/editar usuarios
+   ------------------------------------------------------- */
+
+/* Overlay oscuro de fondo del modal */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -209,8 +252,11 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    padding: 16px;
+    box-sizing: border-box;
 }
 
+/* Cuerpo del modal */
 .modal {
     background-color: #ffffff;
     border-radius: 8px;
@@ -218,6 +264,8 @@
     width: 100%;
     max-width: 480px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-titulo {
@@ -228,7 +276,7 @@
     margin-bottom: 24px;
 }
 
-/* Campos del formulario */
+/* Campos del formulario del modal */
 .campo {
     display: flex;
     flex-direction: column;
@@ -261,7 +309,7 @@
     color: #999;
 }
 
-/* Acciones del modal */
+/* Botones de acción del modal */
 .modal-acciones {
     display: flex;
     justify-content: flex-end;
@@ -300,36 +348,7 @@
     cursor: not-allowed;
 }
 
-/* Mensajes */
-.exito {
-    color: #1e8e3e;
-    font-size: 13px;
-    margin-bottom: 12px;
-}
-
-.error {
-    color: #d93025;
-    font-size: 13px;
-    margin-bottom: 12px;
-}
-
-.btn-accion:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-/* Botón eliminar permanentemente (solo visible en usuarios inactivos) */
-.btn-accion.rojo-oscuro {
-    background-color: #fce8e6;
-    color: #d93025;
-}
-
-.btn-accion.rojo-oscuro:disabled {
-    opacity: 0.2;
-    cursor: not-allowed;
-}
-
-/* Modal de eliminación */
+/* Modal de confirmación de eliminación */
 .modal-eliminar {
     text-align: center;
     max-width: 440px;
@@ -367,11 +386,28 @@
     background-color: #b31c12;
 }
 
-/* Responsive */
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+    .contenido {
+        margin-left: 200px;
+        padding: 24px;
+    }
+}
+
+
+/* =====================================================
+   MÓVIL 
+   ===================================================== */
 @media (max-width: 768px) {
+
     .contenido {
         margin-left: 0;
-        padding: 20px;
+        padding: 16px;
+        padding-top: 64px;
     }
 
     .encabezado {
@@ -380,13 +416,24 @@
         gap: 12px;
     }
 
-    .tabla-container {
-        overflow-x: auto;
+    .btn-crear {
+        width: 100%;
+        text-align: center;
     }
 
     .modal {
         padding: 20px;
-        margin: 16px;
         max-width: 100%;
+    }
+
+    .modal-acciones {
+        flex-direction: column-reverse;
+    }
+
+    .btn-cancelar,
+    .btn-guardar,
+    .btn-eliminar-confirmar {
+        width: 100%;
+        text-align: center;
     }
 }

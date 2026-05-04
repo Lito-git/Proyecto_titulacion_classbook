@@ -1,4 +1,3 @@
-// Importamos las dependencias necesarias
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -58,7 +57,6 @@ export class DashboardComponent implements OnInit {
     });
 
     // Solo pedimos los últimos 5 registros para la actividad reciente
-    // evitando traer toda la tabla historial solo para mostrar 5 filas
     this.http.get<any[]>(`${this.apiUrl}/historial?limit=5`, { headers: this.getHeaders() }).subscribe({
       next: (data) => {
         this.actividadReciente = data;

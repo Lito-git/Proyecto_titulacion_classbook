@@ -1,10 +1,9 @@
 // Importamos las dependencias necesarias
 const express = require('express');
 const router = express.Router();
-const verificarToken = require('../middleware/auth');
-const { obtenerCursos, crearCurso, editarCurso, eliminarCurso } = require('../controllers/cursos.controller');
+const verificarToken = require('../../middleware/auth');
+const { obtenerCursos, crearCurso, editarCurso, eliminarCurso } = require('../../controllers/admin/cursos.controller');
 
-// Todas las rutas requieren token JWT válido
 
 // GET /cursos -> obtiene todos los cursos
 router.get('/', verificarToken, obtenerCursos);

@@ -1,4 +1,7 @@
-/* Importamos la fuente Nunito Sans desde Google Fonts */
+/* =====================================================
+  LOGIN
+   ===================================================== */
+
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap');
 
 
@@ -127,7 +130,9 @@ button:disabled {
     margin-bottom: 8px;
 }
 
-/* Responsive */
+/* =====================================================
+    MOVIL
+    ===================================================== */
 @media (max-width: 768px) {
     .login-container {
         padding: 20px;

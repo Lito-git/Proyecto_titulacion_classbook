@@ -3,8 +3,7 @@ const mysql = require('mysql2');
 require('dotenv').config();
 
 // Creamos un pool de conexiones a la base de datos
-// Un pool reutiliza conexiones existentes en lugar de abrir una nueva
-// Esto mejora el rendimiento y evita saturar el servidor de  la DB
+// En pool reutilizará conexiones existentes en vez de abrir una nueva y esto mejora el rendimiento y evita saturar el servidor de la DB
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -12,6 +11,5 @@ const pool = mysql.createPool({
     database: process.env.DB_NAME
 });
 
-// Exportamos el pool con soporte para promesas
-// Esto es para usar async/await en los controladores
+// Exportamos el pool con soporte para promesas para poder usar async/await en los controladores
 module.exports = pool.promise();

@@ -1,3 +1,8 @@
+/* =====================================================
+   GESTIÓN DE ASIGNATURAS
+   ===================================================== */
+
+
 /* Layout principal */
 .layout {
     display: flex;
@@ -5,14 +10,14 @@
     background-color: #f5f5f5;
 }
 
-/* Contenido principal */
 .contenido {
     margin-left: 230px;
     padding: 40px;
     flex: 1;
+    min-width: 0;
 }
 
-/* Encabezado */
+/* Encabezado con título y botón crear */
 .encabezado {
     display: flex;
     justify-content: space-between;
@@ -33,7 +38,7 @@
     color: #999;
 }
 
-/* Nota informativa */
+/* Nota informativa (recuadro azul) */
 .nota-info {
     background-color: #e8f0fe;
     border-left: 4px solid #1a73e8;
@@ -44,7 +49,7 @@
     color: #1a73e8;
 }
 
-/* Botón crear */
+/* Botón crear asignatura */
 .btn-crear {
     padding: 10px 20px;
     background-color: #7c3aed;
@@ -55,10 +60,24 @@
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
+    white-space: nowrap;
 }
 
 .btn-crear:hover {
     background-color: #6d28d9;
+}
+
+/* Mensajes de éxito y error */
+.exito {
+    color: #1e8e3e;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.error {
+    color: #d93025;
+    font-size: 13px;
+    margin-bottom: 12px;
 }
 
 /* Lista de asignaturas */
@@ -79,14 +98,15 @@
     justify-content: space-between;
 }
 
-/* Info de la asignatura */
+/* Info de la asignatura: icono + nombre + descripción */
 .asignatura-info {
     display: flex;
     align-items: flex-start;
     gap: 16px;
+    flex: 1;
 }
 
-/* Icono de la asignatura */
+/* Cuadro de icono de la asignatura */
 .asignatura-icono {
     width: 40px;
     height: 40px;
@@ -111,12 +131,13 @@
     margin-bottom: 12px;
 }
 
-/* Acciones */
+/* Acciones de la asignatura */
 .asignatura-acciones {
     display: flex;
     gap: 8px;
 }
 
+/* Botón editar */
 .btn-editar {
     display: flex;
     align-items: center;
@@ -135,6 +156,12 @@
     background-color: #e8e8e8;
 }
 
+/*
+  BOTÓN ELIMINAR - Comentado por diseño (implementación futura)
+  Este botón quedará disponible para cuando se implemente la
+  lógica de eliminación de asignaturas con sus validaciones.
+  La estructura ya está lista para usar cuando se necesite.
+
 .btn-eliminar {
     display: flex;
     align-items: center;
@@ -152,8 +179,9 @@
 .btn-eliminar:hover {
     background-color: #f5c6c3;
 }
+*/
 
-/* Badge activa */
+/* Badge "Activa" */
 .badge-activa {
     background-color: #e6f4ea;
     color: #1e8e3e;
@@ -164,7 +192,10 @@
     flex-shrink: 0;
 }
 
-/* Modal */
+/* -------------------------------------------------------
+   MODAL
+   ------------------------------------------------------- */
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -176,6 +207,8 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    padding: 16px;
+    box-sizing: border-box;
 }
 
 .modal {
@@ -185,6 +218,8 @@
     width: 100%;
     max-width: 480px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-titulo {
@@ -258,28 +293,60 @@
     cursor: not-allowed;
 }
 
-.exito {
-    color: #1e8e3e;
-    font-size: 13px;
-    margin-bottom: 12px;
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+    .contenido {
+        margin-left: 200px;
+        padding: 24px;
+    }
 }
 
-.error {
-    color: #d93025;
-    font-size: 13px;
-    margin-bottom: 12px;
-}
 
-/* Responsive */
+/* =====================================================
+   MÓVIL
+   ===================================================== */
 @media (max-width: 768px) {
+
     .contenido {
         margin-left: 0;
-        padding: 20px;
+        padding: 16px;
+        padding-top: 64px;
     }
 
     .encabezado {
         flex-direction: column;
         align-items: flex-start;
         gap: 12px;
+    }
+
+    .btn-crear {
+        width: 100%;
+        text-align: center;
+    }
+
+    .item-asignatura {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .modal {
+        padding: 20px;
+        max-width: 100%;
+    }
+
+    .modal-acciones {
+        flex-direction: column-reverse;
+    }
+
+    .btn-cancelar,
+    .btn-guardar {
+        width: 100%;
+        text-align: center;
     }
 }

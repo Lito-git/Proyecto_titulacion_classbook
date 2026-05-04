@@ -1,4 +1,3 @@
-// Importamos las dependencias necesarias
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -32,8 +31,7 @@ export class AuthService {
     sessionStorage.setItem('curso', curso);
   }
 
-  // Cierra la sesión eliminando los datos del sessionStorage
-  // y redirige al login
+  // Cierra la sesión eliminando los datos del sessionStorage y redirige al login
   cerrarSesion() {
     sessionStorage.clear();
     this.router.navigate(['/login']);

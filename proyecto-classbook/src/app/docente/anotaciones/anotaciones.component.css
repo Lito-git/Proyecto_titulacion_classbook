@@ -1,3 +1,8 @@
+/* =====================================================
+   GESTIÓN DE ANOTACIONES
+   ===================================================== */
+
+
 /* Layout principal */
 .layout {
     display: flex;
@@ -5,11 +10,11 @@
     background-color: #f5f5f5;
 }
 
-/* Contenido principal */
 .contenido {
     margin-left: 230px;
     padding: 40px;
     flex: 1;
+    min-width: 0;
 }
 
 /* Títulos */
@@ -27,7 +32,7 @@
     margin-bottom: 24px;
 }
 
-/* Card formulario */
+/* Card del formulario de registro */
 .formulario-card {
     background-color: #ffffff;
     border-radius: 8px;
@@ -51,7 +56,7 @@
     margin-bottom: 16px;
 }
 
-/* Campos */
+/* Campos del formulario */
 .campo {
     display: flex;
     flex-direction: column;
@@ -81,7 +86,7 @@
     border-color: #16a34a;
 }
 
-/* Radio buttons */
+/* Radio buttons de tipo de anotación (positiva/negativa) */
 .radio-group {
     display: flex;
     gap: 24px;
@@ -122,12 +127,37 @@
     cursor: not-allowed;
 }
 
-/* Filtros */
+/* Buscador lista de anotaciones */
 .filtros {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 16px;
+}
+
+.buscador-lista {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+}
+
+.buscador-lista:focus {
+    border-color: #16a34a;
+}
+
+/* Filtros por tipo (Todas / Positivas / Negativas) */
+.filtros-tipo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
 }
 
 .filtros-label {
@@ -164,7 +194,7 @@
     color: white;
 }
 
-/* Lista de anotaciones */
+/* Card lista de anotaciones */
 .lista-card {
     background-color: #ffffff;
     border-radius: 8px;
@@ -184,7 +214,7 @@
     border-bottom: none;
 }
 
-/* Icono de anotación */
+/* Icono circular de anotación */
 .anotacion-icono {
     width: 40px;
     height: 40px;
@@ -208,13 +238,17 @@
 /* Contenido de la anotación */
 .anotacion-contenido {
     flex: 1;
+    min-width: 0;
 }
 
+/* Encabezado: nombre del estudiante y curso */
 .anotacion-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 4px;
+    flex-wrap: wrap;
+    gap: 4px;
 }
 
 .anotacion-nombre {
@@ -228,7 +262,7 @@
     color: #999;
 }
 
-/* Badge tipo */
+/* Badge de tipo positiva/negativa */
 .badge-tipo {
     display: inline-block;
     padding: 2px 10px;
@@ -248,17 +282,18 @@
     color: #d93025;
 }
 
-/* Descripción */
+/* Descripción de la anotación */
 .anotacion-descripcion {
     font-size: 14px;
     color: #333;
     margin-bottom: 8px;
 }
 
-/* Metadatos */
+/* Metadatos: fecha y profesor */
 .anotacion-meta {
     display: flex;
     gap: 16px;
+    flex-wrap: wrap;
 }
 
 .meta-item {
@@ -290,7 +325,7 @@
     margin-bottom: 12px;
 }
 
-/* Buscador de estudiante */
+/* Buscador con sugerencias */
 .buscador-container {
     position: relative;
 }
@@ -358,55 +393,41 @@
     color: #999;
 }
 
-/* Buscador de lista de anotaciones */
-.buscador-lista {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 14px;
-    outline: none;
-    box-sizing: border-box;
-    margin-bottom: 12px;
-    transition: border-color 0.2s;
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+    .contenido {
+        margin-left: 200px;
+        padding: 24px;
+    }
 }
 
-.buscador-lista:focus {
-    border-color: #16a34a;
-}
 
-/* Filtros tipo separados del buscador */
-.filtros-tipo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-/* Responsive */
+/* =====================================================
+   MÓVIL
+   ===================================================== */
 @media (max-width: 768px) {
+
     .contenido {
         margin-left: 0;
-        padding: 20px;
+        padding: 16px;
+        padding-top: 64px;
     }
 
     .formulario-grid {
         grid-template-columns: 1fr;
     }
 
-    .filtros {
+    .radio-group {
         flex-wrap: wrap;
+        gap: 12px;
     }
 
-    .filtros-tipo {
-        flex-wrap: wrap;
-    }
-
-    .buscador-container {
-        width: 100%;
-    }
-
-    .buscador-lista {
-        width: 100%;
+    .anotacion-meta {
+        flex-direction: column;
+        gap: 6px;
     }
 }

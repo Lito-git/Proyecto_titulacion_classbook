@@ -1,5 +1,5 @@
 // Importamos la conexión a la base de datos
-const db = require('../config/db');
+const db = require('../../config/db');
 
 // Obtener todas las asignaturas
 const obtenerAsignaturas = async (req, res) => {
@@ -42,7 +42,7 @@ const editarAsignatura = async (req, res) => {
     }
 };
 
-// Eliminar una asignatura — verifica que no tenga usuarios ACTIVOS ni calificaciones
+// Eliminar una asignatura verificando que no tenga usuarios ACTIVOS ni calificaciones
 const eliminarAsignatura = async (req, res) => {
     const { id } = req.params;
     try {

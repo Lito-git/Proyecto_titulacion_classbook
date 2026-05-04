@@ -1,18 +1,20 @@
-/* Layout principal */
+/* =====================================================
+   INICIO (PANEL)
+   ===================================================== */
+
 .layout {
     display: flex;
     min-height: 100vh;
     background-color: #f5f5f5;
 }
 
-/* Contenido principal */
 .contenido {
     margin-left: 230px;
     padding: 40px;
     flex: 1;
+    min-width: 0;
 }
 
-/* Títulos */
 .titulo {
     font-family: 'Nunito Sans', sans-serif;
     font-size: 24px;
@@ -35,7 +37,6 @@
     margin-bottom: 24px;
 }
 
-/* Tarjeta individual */
 .tarjeta {
     background-color: #ffffff;
     border-radius: 8px;
@@ -43,6 +44,7 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
+/* Icono de la tarjeta con fondo de color según tipo */
 .tarjeta-icon {
     display: flex;
     align-items: center;
@@ -81,7 +83,7 @@
     color: #999;
 }
 
-/* Cards */
+/* Cards de rendimiento y alertas */
 .card {
     background-color: #ffffff;
     border-radius: 8px;
@@ -126,6 +128,7 @@
     display: flex;
     gap: 16px;
     font-size: 13px;
+    flex-wrap: wrap;
 }
 
 .meta-estudiantes {
@@ -157,7 +160,7 @@
     color: #999;
 }
 
-/* Alertas */
+/* Items de alerta */
 .alerta-item {
     display: flex;
     align-items: flex-start;
@@ -216,7 +219,6 @@
     flex-shrink: 0;
 }
 
-/* Sin datos */
 .sin-datos {
     text-align: center;
     padding: 32px 0;
@@ -224,15 +226,34 @@
     color: #999;
 }
 
-/* Responsive */
+/* =====================================================
+   TABLET
+   ===================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .contenido {
+        margin-left: 200px;
+        padding: 24px;
+    }
+
+    /* 2 tarjetas por fila en tablet */
+    .tarjetas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* =====================================================
+   MÓVIL
+   ===================================================== */
 @media (max-width: 768px) {
     .contenido {
         margin-left: 0;
-        padding: 20px;
+        padding: 16px;
+        padding-top: 64px;
     }
 
+    /* Una tarjeta por fila */
     .tarjetas {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
     }
 
     .curso-item {
@@ -241,9 +262,8 @@
         gap: 8px;
     }
 
-    .curso-meta {
-        flex-wrap: wrap;
-        gap: 8px;
+    .curso-promedio {
+        align-items: flex-start;
     }
 
     .alerta-item {
