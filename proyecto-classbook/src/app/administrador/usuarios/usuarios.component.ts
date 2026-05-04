@@ -48,7 +48,7 @@ export class UsuariosComponent implements OnInit {
     asignatura_id: 0
   };
 
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'https://classbook-backend.onrender.com';
 
   constructor(private http: HttpClient) { }
 

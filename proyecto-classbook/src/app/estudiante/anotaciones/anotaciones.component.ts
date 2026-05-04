@@ -21,7 +21,7 @@ export class AnotacionesComponent implements OnInit {
   anotaciones: any[] = [];
   totalSemestre: number = 0;
 
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'https://classbook-backend.onrender.com';
 
   constructor(private http: HttpClient) { }
 

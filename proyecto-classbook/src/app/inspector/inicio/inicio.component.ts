@@ -33,7 +33,7 @@ export class InicioComponent implements OnInit {
   alertasNegativas: any[] = [];
   alertasRendimiento: any[] = [];
 
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'https://classbook-backend.onrender.com';
 
   constructor(private http: HttpClient) { }
 

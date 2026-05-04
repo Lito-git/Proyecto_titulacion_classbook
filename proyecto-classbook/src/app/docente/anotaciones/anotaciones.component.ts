@@ -41,7 +41,7 @@ export class AnotacionesComponent implements OnInit {
   mensajeError: string = '';
   cargando: boolean = false;
 
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'https://classbook-backend.onrender.com';
 
   constructor(private http: HttpClient) { }
 

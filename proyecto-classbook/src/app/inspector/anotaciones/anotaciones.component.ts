@@ -38,7 +38,7 @@ export class AnotacionesComponent implements OnInit {
   estudiantesFiltrados: any[] = [];
   estudianteSeleccionado: any = null;
 
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'https://classbook-backend.onrender.com';
 
   constructor(private http: HttpClient) { }
 

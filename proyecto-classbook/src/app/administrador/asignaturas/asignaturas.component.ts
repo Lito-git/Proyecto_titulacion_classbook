@@ -26,7 +26,7 @@ export class AsignaturasComponent implements OnInit {
 
   formulario = { id: 0, nombre: '', descripcion: '' };
 
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'https://classbook-backend.onrender.com';
 
   constructor(private http: HttpClient) { }
 

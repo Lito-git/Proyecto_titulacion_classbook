@@ -39,7 +39,7 @@ export class ReportesComponent implements OnInit, AfterViewInit, OnDestroy {
   // Guardamos el timeout para poder cancelarlo
   private renderTimeout: any = null;
 
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'https://classbook-backend.onrender.com';
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
 
