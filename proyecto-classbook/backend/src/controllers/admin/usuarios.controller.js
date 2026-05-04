@@ -41,7 +41,6 @@ const obtenerUsuarios = async (req, res) => {
 const crearUsuario = async (req, res) => {
     const { nombre, segundo_nombre, apellido, segundo_apellido, email, rol_id, rut, fecha_nacimiento, curso_id, asignatura_id } = req.body;
 
-    // Obtenemos una conexión del pool para usar transacción
     const conn = await db.getConnection();
 
     try {
@@ -58,7 +57,6 @@ const crearUsuario = async (req, res) => {
         const contrasenaTemp = generarContrasenaTemp();
         const hash = await bcrypt.hash(contrasenaTemp, 10);
 
-        // Iniciamos la transacción y si algo falla, se revierte todo
         await conn.beginTransaction();
 
         const [resultado] = await conn.query(
@@ -99,12 +97,16 @@ const crearUsuario = async (req, res) => {
             );
         }
 
-        // Todo salió bien entonces confirmamos la transacción
         await conn.commit();
         conn.release();
 
-        // Enviamos el correo solo si la transacción fue exitosa
-        await enviarContrasenaTemp(email, nombre, contrasenaTemp);
+        // Enviamos el correo de forma no bloqueante
+        // Si falla el correo, el usuario igual queda creado
+        try {
+            await enviarContrasenaTemp(email, nombre, contrasenaTemp);
+        } catch (mailError) {
+            console.error('Error al enviar correo:', mailError.message);
+        }
 
         res.json({ mensaje: `Usuario creado exitosamente. Se envió la contraseña temporal a ${email}.` });
 
@@ -134,7 +136,7 @@ const editarUsuario = async (req, res) => {
     }
 };
 
-// Resetear contraseña de un usuario en el panel del Administrador.
+// Resetear contraseña de un usuario en el panel del Administrador
 const resetearContrasena = async (req, res) => {
     const { id } = req.params;
 
@@ -149,7 +151,6 @@ const resetearContrasena = async (req, res) => {
         }
 
         const usuario = usuarios[0];
-
         const contrasenaTemp = generarContrasenaTemp();
         const hash = await bcrypt.hash(contrasenaTemp, 10);
 
@@ -158,7 +159,12 @@ const resetearContrasena = async (req, res) => {
             [hash, id]
         );
 
-        await enviarContrasenaTemp(usuario.usuario_email, usuario.usuario_nombre, contrasenaTemp);
+        // Enviamos el correo de forma no bloqueante
+        try {
+            await enviarContrasenaTemp(usuario.usuario_email, usuario.usuario_nombre, contrasenaTemp);
+        } catch (mailError) {
+            console.error('Error al enviar correo:', mailError.message);
+        }
 
         res.json({ mensaje: `Contraseña reseteada. Se envió la nueva contraseña temporal a ${usuario.usuario_email}.` });
 
@@ -205,13 +211,12 @@ const toggleActivoUsuario = async (req, res) => {
     }
 };
 
-// Eliminar físicamente un usuario y todos sus datos asociados en cascada en Panel de Administrador.
+// Eliminar físicamente un usuario y todos sus datos asociados en cascada
 const eliminarUsuario = async (req, res) => {
     const { id } = req.params;
     const conn = await db.getConnection();
 
     try {
-        // Verificamos que el usuario existe
         const [usuarios] = await conn.query(
             'SELECT u.*, r.rol_nombre FROM usuarios u JOIN roles r ON r.rol_id = u.usuario_rol_id WHERE u.usuario_id = ?',
             [id]
@@ -224,7 +229,6 @@ const eliminarUsuario = async (req, res) => {
 
         const usuario = usuarios[0];
 
-        // No permitir eliminar la propia cuenta del administrador autenticado
         if (parseInt(id) === req.usuario.id) {
             conn.release();
             return res.status(400).json({ mensaje: 'No puedes eliminar tu propia cuenta.' });
@@ -233,7 +237,6 @@ const eliminarUsuario = async (req, res) => {
         await conn.beginTransaction();
 
         if (usuario.rol_nombre === 'estudiante') {
-            // Obtenemos el estudiante_id
             const [estudiante] = await conn.query(
                 'SELECT estudiante_id FROM estudiantes WHERE estudiante_usuario_id = ?', [id]
             );
@@ -241,7 +244,6 @@ const eliminarUsuario = async (req, res) => {
             if (estudiante.length > 0) {
                 const estudianteId = estudiante[0].estudiante_id;
 
-                // Eliminamos historial relacionado con calificaciones del estudiante
                 await conn.query(
                     `DELETE FROM historial_cambios WHERE historial_registro_id IN (
                         SELECT calificacion_id FROM calificaciones WHERE calificacion_estudiante_id = ?
@@ -249,7 +251,6 @@ const eliminarUsuario = async (req, res) => {
                     [estudianteId]
                 );
 
-                // Eliminamos historial relacionado con anotaciones del estudiante
                 await conn.query(
                     `DELETE FROM historial_cambios WHERE historial_registro_id IN (
                         SELECT anotacion_id FROM anotaciones WHERE anotacion_estudiante_id = ?
@@ -257,17 +258,14 @@ const eliminarUsuario = async (req, res) => {
                     [estudianteId]
                 );
 
-                // Eliminamos calificaciones del estudiante
                 await conn.query(
                     'DELETE FROM calificaciones WHERE calificacion_estudiante_id = ?', [estudianteId]
                 );
 
-                // Eliminamos anotaciones del estudiante
                 await conn.query(
                     'DELETE FROM anotaciones WHERE anotacion_estudiante_id = ?', [estudianteId]
                 );
 
-                // Eliminamos registro en estudiantes
                 await conn.query(
                     'DELETE FROM estudiantes WHERE estudiante_id = ?', [estudianteId]
                 );
@@ -275,28 +273,20 @@ const eliminarUsuario = async (req, res) => {
         }
 
         if (usuario.rol_nombre === 'docente') {
-            // Eliminamos historial de acciones del docente
             await conn.query(
                 'DELETE FROM historial_cambios WHERE historial_usuario_id = ?', [id]
             );
-
-            // Eliminamos calificaciones registradas por el docente
             await conn.query(
                 'DELETE FROM calificaciones WHERE calificacion_profesor_id = ?', [id]
             );
-
-            // Eliminamos anotaciones registradas por el docente
             await conn.query(
                 'DELETE FROM anotaciones WHERE anotacion_profesor_id = ?', [id]
             );
-
-            // Eliminamos asignaciones del docente
             await conn.query(
                 'DELETE FROM docente_asignatura WHERE docente_usuario_id = ?', [id]
             );
         }
 
-        // Finalmente eliminamos el usuario
         await conn.query('DELETE FROM usuarios WHERE usuario_id = ?', [id]);
 
         await conn.commit();
