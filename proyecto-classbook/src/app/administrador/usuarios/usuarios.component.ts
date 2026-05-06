@@ -100,12 +100,14 @@ export class UsuariosComponent implements OnInit {
       const nombreCompleto = `${u.usuario_nombre} ${u.usuario_segundo_nombre || ''} ${u.usuario_apellido} ${u.usuario_segundo_apellido || ''}`.toLowerCase();
       const curso = `${u.estudiante_curso || ''} ${u.docente_curso || ''}`.toLowerCase();
       const asignatura = `${u.docente_asignatura || ''}`.toLowerCase();
+      const estado = (u.usuario_activo ? 'activo' : 'inactivo').toLowerCase();
 
       return nombreCompleto.includes(texto) ||
         u.usuario_email.toLowerCase().includes(texto) ||
         u.rol_nombre.toLowerCase().includes(texto) ||
         curso.includes(texto) ||
-        asignatura.includes(texto);
+        asignatura.includes(texto) ||
+        estado.startsWith(texto);
     });
   }
 
