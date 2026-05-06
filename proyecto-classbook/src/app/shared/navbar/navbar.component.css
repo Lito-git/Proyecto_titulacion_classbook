@@ -273,6 +273,7 @@
     .navbar {
         width: 260px;
         height: 100vh;
+        height: 100dvh;
         min-height: unset;
         padding: 0;
         z-index: 200;
