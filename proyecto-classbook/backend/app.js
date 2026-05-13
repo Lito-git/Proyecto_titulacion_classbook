@@ -1,6 +1,7 @@
 // Importamos las dependencias principales
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 // Importamos la conexión a la base de datos
@@ -23,6 +24,19 @@ const inspectorRoutes = require('./src/routes/inspector.routes');
 // Inicializamos la aplicación Express
 const app = express();
 
+// Rate limiters
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // ventana de 15 minutos para limitar las peticiones
+  max: 100,                 // máximo 100 peticiones por IP en la ventana de tiempo
+  message: { error: 'Demasiadas peticiones desde esta IP, por favor intente mas tarde' }
+});
+
+const loginLimiter = rateLimit ({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Demasiados intentos de inicio de sesión, por favor intente mas tarde' } 
+});
+
 // Middlewares globales
 app.use(cors({                              // Permite peticiones desde el frontend Angular
   origin: [
@@ -32,9 +46,10 @@ app.use(cors({                              // Permite peticiones desde el front
   credentials: true
 }));
 app.use(express.json());  // Permite leer el body de las peticiones en formato JSON
+app.use(limiter);       // Aplica el rate limiter global a todas las rutas
 
 // Registramos las rutas con sus prefijos
-app.use('/auth', authRoutes);
+app.use('/auth', loginLimiter, authRoutes); // Se aplica el limiter estricto solo en el Login
 
 app.use('/usuarios', usuariosRoutes);
 app.use('/cursos', cursosRoutes);
