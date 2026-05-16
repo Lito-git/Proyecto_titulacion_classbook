@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
 import { LINKS_ESTUDIANTE } from '../../shared/navbar.links';
 import Chart from 'chart.js/auto';
-import { FIRMA_DIRECTOR, TIMBRE_DIRECTOR } from '../../shared/images.constants';
+import { FIRMA_DIRECTOR, TIMBRE_DIRECTOR, LOGO_COLEGIO } from '../../shared/images.constants';
 
 @Component({
   selector: 'app-calificaciones',
@@ -177,6 +177,8 @@ export class CalificacionesComponent implements OnInit, AfterViewInit, OnDestroy
 
       doc.setFillColor(23, 45, 68);
       doc.rect(0, 0, pageWidth, 38, 'F');
+
+      doc.addImage(LOGO_COLEGIO, 'PNG', 12, 4, 30, 30);
 
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(18);
